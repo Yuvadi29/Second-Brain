@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +18,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@chroma-core/default-embed": "^0.1.9",
     "chromadb": "^3.1.6",
     "dotenv": "^17.2.3"
   }
