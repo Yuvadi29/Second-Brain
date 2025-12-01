@@ -185,11 +185,11 @@ function verifySignature(payload, signature) {
 }
 async function fetchFileContent(path, ref) {
     const encodedPath = path.split('/').map((s)=>encodeURIComponent(s)).join('/');
-    const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURIComponent(path)}?ref=${ref}`;
+    const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodedPath}?ref=${ref}`;
     console.log(`Fetching from: ${url}`);
     const res = await fetch(url, {
         headers: {
-            Authorization: `Bearer ${GITHUB_TOKEN}`,
+            // Authorization: `Bearer ${GITHUB_TOKEN}`,
             Accept: "application/vnd.github.v3.raw"
         }
     });
@@ -226,15 +226,21 @@ async function POST(req) {
     console.log(`Payload received for ref: ${payload?.ref}, after: ${payload?.after}`);
     const afterSha = payload?.after;
     const commits = payload?.commits ?? [];
+    // const touchedFiles: string[] = [];
     const touchedFiles = [];
     for (const c of commits){
-        console.log(`Processing commit: ${c.id}, added: ${c.added}, modified: ${c.modified}`);
+        const added = c.added ?? [];
+        const modified = c.modified ?? [];
         for (const f of [
-            ...c.added,
-            ...c.modified
+            ...added,
+            ...modified
         ]){
-            if (typeof f === "string" && f.includes("knowledge/")) {
-                touchedFiles?.push(f);
+            if (typeof f === "string") {
+                const normalized = f.replace(/^second-brain\//, ""); // <— FIX HERE
+                console.log("Checking file:", f, "→ normalized:", normalized);
+                if (normalized.startsWith("knowledge/")) {
+                    touchedFiles.push(normalized);
+                }
             }
         }
     }
@@ -248,11 +254,8 @@ async function POST(req) {
     for (const path of touchedFiles){
         console.log(`Fetching content for: ${path}`);
         const content = await fetchFileContent(path, afterSha);
-        if (content === null) {
-            continue;
-        }
         if (!content) {
-            console.log(`Content is empty for ${path}, skipping ingestion`);
+            console.log(`Content is empty or failed to fetch for ${path}, skipping ingestion`);
             continue;
         }
         console.log(`Content fetched for ${path}, length: ${content.length}`);
@@ -264,11 +267,6 @@ async function POST(req) {
         } catch (error) {
             console.error(`Error ingesting ${path}:`, error);
         }
-    // await collection?.add({
-    //     ids: [path],
-    //     documents: [content],
-    //     metadatas: [{ path, ref: afterSha }],
-    // });
     }
     return new Response("OK", {
         status: 200

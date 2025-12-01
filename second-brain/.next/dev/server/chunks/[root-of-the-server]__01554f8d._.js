@@ -187,13 +187,19 @@ function verifySignature(payload, signature) {
     return __TURBOPACK__imported__module__$5b$externals$5d2f$crypto__$5b$external$5d$__$28$crypto$2c$__cjs$29$__["default"]?.timingSafeEqual(Buffer?.from(digest), Buffer?.from(signature));
 }
 async function fetchFileContent(path, ref) {
-    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURIComponent(path)}?ref=${ref}`, {
+    const encodedPath = path.split('/').map((s)=>encodeURIComponent(s)).join('/');
+    const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodedPath}?ref=${ref}`;
+    console.log(`Fetching from: ${url}`);
+    const res = await fetch(url, {
         headers: {
-            Authorization: `Bearer ${GITHUB_TOKEN}`,
+            // Authorization: `Bearer ${GITHUB_TOKEN}`,
             Accept: "application/vnd.github.v3.raw"
         }
     });
-    if (res.status === 404) return null;
+    if (res.status === 404) {
+        console.error(`File not found (404): ${path}`);
+        return null;
+    }
     if (!res.ok) {
         console.error("GitHub fetch error: ", res.status, await res.text());
         return null;
@@ -201,50 +207,64 @@ async function fetchFileContent(path, ref) {
     return await res.text();
 }
 async function POST(req) {
+    console.log("Webhook received");
     const rawBody = await req.text();
     const signature = req.headers.get("x-hub-signature-256");
     if (!verifySignature(rawBody, signature)) {
+        console.error("Invalid signature");
         return new Response("Invalid signature", {
             status: 401
         });
     }
+    console.log("Signature verified");
     const event = req.headers.get("x-github-event");
+    console.log(`Event: ${event}`);
     if (event !== "push") {
+        console.log("Ignored event (not push)");
         return new Response("Ignored", {
             status: 204
         });
     }
     const payload = JSON.parse(rawBody);
+    console.log(`Payload received for ref: ${payload?.ref}, after: ${payload?.after}`);
     const afterSha = payload?.after;
     const commits = payload?.commits ?? [];
     const touchedFiles = [];
     for (const c of commits){
+        console.log(`Processing commit: ${c.id}, added: ${c.added}, modified: ${c.modified}`);
         for (const f of [
             ...c.added,
             ...c.modified
         ]){
-            if (typeof f === "string" && f.startsWith("knowledge/")) {
+            if (typeof f === "string" && f.includes("knowledge/")) {
                 touchedFiles?.push(f);
             }
         }
     }
+    console.log(`Touched knowledge files: ${touchedFiles.join(", ")}`);
     if (touchedFiles?.length === 0) {
+        console.log("No knowledge files changed");
         return new Response("No knowledge files changed", {
             status: 200
         });
     }
     const collection = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chromaClient$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getOrCreateCollection"])("secondbrain");
     for (const path of touchedFiles){
+        console.log(`Fetching content for: ${path}`);
         const content = await fetchFileContent(path, afterSha);
-        if (!content) continue;
-        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chunkAndIngest$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["ingestTextIntoChroma"])("secondbrain", path, content, {
-            ref: afterSha
-        });
-    // await collection?.add({
-    //     ids: [path],
-    //     documents: [content],
-    //     metadatas: [{ path, ref: afterSha }],
-    // });
+        if (!content) {
+            console.log(`Content is empty or failed to fetch for ${path}, skipping ingestion`);
+            continue;
+        }
+        console.log(`Content fetched for ${path}, length: ${content.length}`);
+        try {
+            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chunkAndIngest$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["ingestTextIntoChroma"])("secondbrain", path, content, {
+                ref: afterSha
+            });
+            console.log(`Successfully ingested ${path}`);
+        } catch (error) {
+            console.error(`Error ingesting ${path}:`, error);
+        }
     }
     return new Response("OK", {
         status: 200
