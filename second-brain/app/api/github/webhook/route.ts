@@ -24,7 +24,7 @@ async function fetchFileContent(path: string, ref: string): Promise<string | nul
         {
             headers: {
                 Authorization: `Bearer ${GITHUB_TOKEN}`,
-                Accept: "application/vnd.githb.v3.raw",
+                Accept: "application/vnd.github.v3.raw",
             }
         }
     );

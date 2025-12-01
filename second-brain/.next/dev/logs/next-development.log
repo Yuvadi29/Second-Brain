@@ -6,3 +6,4 @@
 [00:08:10.601] Server  LOG     [webhook] touched knowledge files: []
 [00:08:25.156] Server  LOG     [webhook] received {}
 [00:08:25.156] Server  LOG     [webhook] touched knowledge files: []
+[00:09:42.436] Server  LOG     [dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
