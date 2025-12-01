@@ -56,6 +56,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../../app/api/github/webhook/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/github/webhook">> = Specific
+  const handler = {} as typeof import("../../../app/api/github/webhook/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../../app/api/injest/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/injest">> = Specific
