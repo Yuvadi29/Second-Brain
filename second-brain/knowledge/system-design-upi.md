@@ -1,4 +1,4 @@
-### Traditional Approach for Payments in India
+### Traditional Approach for Payments in India UPI
 Traditional System for Payments in India work on the basis of banks. Users must have a bank account to make payments. They can have their accounts in any of the banks like ICICI, HDFC, SBI, HSBC, etc. 
 All these banks are regulated by RBI which is the Reserve Bank of India
 
