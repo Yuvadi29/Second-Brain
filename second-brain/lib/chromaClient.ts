@@ -1,22 +1,25 @@
-import {ChromaClient} from "chromadb";
+
+import { CloudClient } from "chromadb";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const CHROMA_URL = process.env.CHROMA_URL || "http://localhost:8000";
+const apiKey = process.env.CHROMA_API_KEY!;
+const tenant = process.env.CHROMA_TENANT!;
+const database = process.env.CHROMA_DATABASE!;
 
-export const chromaClient = new ChromaClient({
-    path: CHROMA_URL,
-});
+if (!apiKey || !tenant || !database) {
+  throw new Error("CHROMA_API_KEY, CHROMA_TENANT, CHROMA_DATABASE must be set");
+}
+
+export const chroma = new CloudClient({
+  apiKey,
+  tenant,
+  database,
+})
 
 export async function getOrCreateCollection(name: string) {
-    try {
-        const collection = await chromaClient.getOrCreateCollection({
-            name,
-        });
-        return collection;
-    } catch (error) {
-        console.error("Error getting/creating chroma Collection: ", error);
-        throw error;
-    }
+  return chroma.getOrCreateCollection({
+    name,
+  });
 }
