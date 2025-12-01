@@ -1,44 +1,24 @@
-import { getOrCreateCollection } from "@/lib/chromaClient";
-import { ingestTextIntoChroma } from "@/lib/chunkAndIngest";
 import crypto from "crypto";
-import { after, NextRequest } from "next/server";
+import { NextRequest } from "next/server";
+import { extractTextFromGithubFile } from "@/lib/extractGithubFile";
+import { ingestTextIntoChroma } from "@/lib/chunkAndIngest";
 
 export const runtime = "nodejs";
 
 const GH_SECRET = process.env.GITHUB_WEBHOOK_SECRET!;
-const OWNER = process.env.GITHUB_REPO_OWNER!;
-const REPO = process.env.GITHUB_REPO_NAME!;
-const GITHUB_TOKEN = process.env.GITHUB_ACCESS_TOKEN!;
 
 function verifySignature(payload: string, signature: string | null) {
     if (!signature) return false;
     const hmac = crypto.createHmac("sha256", GH_SECRET);
-    const digest = `sha256=${hmac.update(payload).digest('hex')}`;
-    return crypto?.timingSafeEqual(Buffer?.from(digest), Buffer?.from(signature));
-};
-
-async function fetchFileContent(path: string, ref: string): Promise<string | null> {
-
-    const res = await fetch(
-        `https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURIComponent(path)}?ref=${ref}`,
-        {
-            headers: {
-                Authorization: `Bearer ${GITHUB_TOKEN}`,
-                Accept: "application/vnd.githb.v3.raw",
-            }
-        }
-    );
-
-    if (res.status === 404) return null;
-    if (!res.ok) {
-        console.error("GitHub fetch error: ", res.status, await res.text());
-        return null;
+    const digest = `sha256=${hmac.update(payload).digest("hex")}`;
+    try {
+        return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(signature));
+    } catch {
+        return false;
     }
-
-    return await res.text();
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     const rawBody = await req.text();
     const signature = req.headers.get("x-hub-signature-256");
 
@@ -52,41 +32,34 @@ export async function POST(req: Request) {
     }
 
     const payload = JSON.parse(rawBody);
+    const afterSha = payload.after as string;
+    const commits = payload.commits ?? [];
 
-    const afterSha = payload?.after as string;
-    const commits = payload?.commits ?? [];
     const touchedFiles: string[] = [];
 
     for (const c of commits) {
-        for (const f of [...c.added, ...c.modified]) {
+        const files = [...(c.added ?? []), ...(c.modified ?? [])];
+        for (const f of files) {
             if (typeof f === "string" && f.startsWith("knowledge/")) {
-                touchedFiles?.push(f);
+                touchedFiles.push(f);
             }
         }
     }
 
-    if (touchedFiles?.length === 0) {
+    if (touchedFiles.length === 0) {
         return new Response("No knowledge files changed", { status: 200 });
     }
 
-    const collection = await getOrCreateCollection("secondbrain");
-
     for (const path of touchedFiles) {
-        const content = await fetchFileContent(path, afterSha);
-        if (!content) continue;
+        const text = await extractTextFromGithubFile(path, afterSha);
+        if (!text) {
+            console.warn("[webhook] No text extracted for", path);
+            continue;
+        }
 
-        await ingestTextIntoChroma(
-            "secondbrain",
-            path,
-            content,
-            { ref: afterSha }
-        )
-
-        // await collection?.add({
-        //     ids: [path],
-        //     documents: [content],
-        //     metadatas: [{ path, ref: afterSha }],
-        // });
+        await ingestTextIntoChroma("secondbrain", path, text, {
+            ref: afterSha,
+        });
     }
 
     return new Response("OK", { status: 200 });

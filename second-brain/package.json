@@ -18,6 +18,7 @@
     "chromadb": "^3.1.6",
     "dotenv": "^17.2.3",
     "langchain": "^1.1.1",
+    "mammoth": "^1.11.0",
     "next": "16.0.6",
     "openai": "^6.9.1",
     "pdf-parse": "^1.1.1",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

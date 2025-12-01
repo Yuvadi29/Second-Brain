@@ -2,3 +2,5 @@
 [00:01:20.183] Server  LOG     [dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
 [00:41:59.102] Server  LOG     [dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
 [00:42:01.981] Server  LOG     Ingested 3 chunks from manual-test-file.md
+[00:43:26.965] Server  LOG     [dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[00:44:56.295] Server  LOG        Reload env: .env
