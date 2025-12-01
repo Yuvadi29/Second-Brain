@@ -235,12 +235,9 @@ async function POST(req) {
             ...added,
             ...modified
         ]){
-            if (typeof f === "string") {
-                const normalized = f.replace(/^second-brain\//, ""); // <— FIX HERE
-                console.log("Checking file:", f, "→ normalized:", normalized);
-                if (normalized.startsWith("knowledge/")) {
-                    touchedFiles.push(normalized);
-                }
+            console.log("Checking file:", f);
+            if (typeof f === "string" && f.includes("knowledge/")) {
+                touchedFiles.push(f);
             }
         }
     }

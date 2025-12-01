@@ -35,12 +35,6 @@ const mod = __turbopack_context__.x("crypto", () => require("crypto"));
 
 module.exports = mod;
 }),
-"[externals]/node:crypto [external] (node:crypto, cjs)", ((__turbopack_context__, module, exports) => {
-
-const mod = __turbopack_context__.x("node:crypto", () => require("node:crypto"));
-
-module.exports = mod;
-}),
 "[externals]/chromadb [external] (chromadb, esm_import)", ((__turbopack_context__) => {
 "use strict";
 
@@ -107,6 +101,12 @@ async function getOrCreateCollection(name) {
 }
 __turbopack_async_result__();
 } catch(e) { __turbopack_async_result__(e); } }, false);}),
+"[externals]/node:crypto [external] (node:crypto, cjs)", ((__turbopack_context__, module, exports) => {
+
+const mod = __turbopack_context__.x("node:crypto", () => require("node:crypto"));
+
+module.exports = mod;
+}),
 "[project]/lib/chunkAndIngest.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
@@ -257,11 +257,14 @@ __turbopack_context__.s([
     ()=>runtime
 ]);
 var __TURBOPACK__imported__module__$5b$externals$5d2f$crypto__$5b$external$5d$__$28$crypto$2c$__cjs$29$__ = __turbopack_context__.i("[externals]/crypto [external] (crypto, cjs)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chromaClient$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/chromaClient.ts [app-route] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chunkAndIngest$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/chunkAndIngest.ts [app-route] (ecmascript)");
 var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
+    __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chromaClient$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__,
     __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chunkAndIngest$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__
 ]);
-[__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chunkAndIngest$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__] = __turbopack_async_dependencies__.then ? (await __turbopack_async_dependencies__)() : __turbopack_async_dependencies__;
+[__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chromaClient$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chunkAndIngest$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__] = __turbopack_async_dependencies__.then ? (await __turbopack_async_dependencies__)() : __turbopack_async_dependencies__;
+;
 ;
 ;
 const runtime = "nodejs";
@@ -312,7 +315,7 @@ async function POST(req) {
             ...c.added,
             ...c.modified
         ]){
-            if (typeof f === "string" && f.includes("knowledge/")) {
+            if (typeof f === "string" && f.startsWith("knowledge/")) {
                 touchedFiles.push(f);
             }
         }
@@ -322,6 +325,7 @@ async function POST(req) {
             status: 200
         });
     }
+    const collection = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chromaClient$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getOrCreateCollection"])("secondbrain");
     for (const path of touchedFiles){
         const content = await fetchFileContent(path, afterSha);
         if (!content) continue;
@@ -337,4 +341,4 @@ __turbopack_async_result__();
 } catch(e) { __turbopack_async_result__(e); } }, false);}),
 ];
 
-//# sourceMappingURL=%5Broot-of-the-server%5D__1b45df4b._.js.map
+//# sourceMappingURL=%5Broot-of-the-server%5D__ff7ae670._.js.map
