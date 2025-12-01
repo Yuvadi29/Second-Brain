@@ -1,3 +1,0 @@
-interface Test{
-    this: string
-}

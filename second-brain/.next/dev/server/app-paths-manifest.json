@@ -1,4 +1,4 @@
 {
-  "/api/github/webhook/route": "app/api/github/webhook/route.js",
-  "/api/injest/test/route": "app/api/injest/test/route.js"
+  "/api/chat/route": "app/api/chat/route.js",
+  "/page": "app/page.js"
 }
