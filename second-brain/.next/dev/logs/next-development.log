@@ -8,3 +8,20 @@
 [00:08:25.156] Server  LOG     [webhook] touched knowledge files: []
 [00:09:42.436] Server  LOG     [dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
 [00:13:02.810] Server  LOG     [dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[00:17:36.964] Server  LOG     [dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[00:17:36.968] Server  LOG     Webhook received
+[00:17:36.968] Server  LOG     Signature verified
+[00:17:36.968] Server  LOG     Event: push
+[00:17:36.969] Server  LOG     Payload received for ref: refs/heads/master, after: d659f65a6f480d407b91637e5b35541a86517723
+[00:17:36.969] Server  LOG     Processing commit: d659f65a6f480d407b91637e5b35541a86517723, added: second-brain/knowledge/testing copy.md, modified: second-brain/.next/dev/logs/next-development.log,second-brain/.next/dev/server/chunks/[root-of-the-server]__01554f8d._.js,second-brain/.next/dev/server/chunks/[root-of-the-server]__01554f8d._.js.map
+[00:17:36.969] Server  LOG     Touched knowledge files: 
+[00:17:36.969] Server  LOG     No knowledge files changed
+[00:19:41.801] Server  LOG     [dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[00:19:41.806] Server  LOG     Webhook received
+[00:19:41.806] Server  LOG     Signature verified
+[00:19:41.806] Server  LOG     Event: push
+[00:19:41.807] Server  LOG     Payload received for ref: refs/heads/master, after: d659f65a6f480d407b91637e5b35541a86517723
+[00:19:41.807] Server  LOG     Processing commit: d659f65a6f480d407b91637e5b35541a86517723, added: second-brain/knowledge/testing copy.md, modified: second-brain/.next/dev/logs/next-development.log,second-brain/.next/dev/server/chunks/[root-of-the-server]__01554f8d._.js,second-brain/.next/dev/server/chunks/[root-of-the-server]__01554f8d._.js.map
+[00:19:41.807] Server  LOG     Touched knowledge files: second-brain/knowledge/testing copy.md
+[00:19:42.669] Server  LOG     Fetching content for: second-brain/knowledge/testing copy.md
+[00:19:43.193] Server  ERROR   Failed to fetch content for second-brain/knowledge/testing copy.md
