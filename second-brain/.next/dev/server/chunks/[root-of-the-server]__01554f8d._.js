@@ -190,7 +190,7 @@ async function fetchFileContent(path, ref) {
     const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURIComponent(path)}?ref=${ref}`, {
         headers: {
             Authorization: `Bearer ${GITHUB_TOKEN}`,
-            Accept: "application/vnd.githb.v3.raw"
+            Accept: "application/vnd.github.v3.raw"
         }
     });
     if (res.status === 404) return null;
