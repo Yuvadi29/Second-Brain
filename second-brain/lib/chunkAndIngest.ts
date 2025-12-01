@@ -1,0 +1,33 @@
+"use server";
+
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+import { getOrCreateCollection } from "./chromaClient";
+
+export async function ingestTextIntoChroma(
+    collectionName: string,
+    filePath: string,
+    text: string,
+    metadata: Record<string, any> = {}
+) {
+    const splitter = new RecursiveCharacterTextSplitter({
+        chunkSize: 1200,
+        chunkOverlap: 200,
+    });
+
+    const chunks = await splitter.splitText(text);
+    const collection = await getOrCreateCollection(collectionName);
+
+    await collection?.add({
+        ids: chunks?.map((_, i) => `${filePath}::${i}`),
+        documents: chunks,
+        metadatas: chunks?.map((_, i) => ({
+            ...metadata,
+            filePath,
+            chunkIndex: i
+        })),
+    });
+
+    console.log(`Ingested ${chunks?.length} chunks from ${filePath}`);
+
+
+}

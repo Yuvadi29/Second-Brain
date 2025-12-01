@@ -1,4 +1,5 @@
 import { getOrCreateCollection } from "@/lib/chromaClient";
+import { ingestTextIntoChroma } from "@/lib/chunkAndIngest";
 import crypto from "crypto";
 import { after, NextRequest } from "next/server";
 
@@ -74,11 +75,18 @@ export async function POST(req: Request) {
         const content = await fetchFileContent(path, afterSha);
         if (!content) continue;
 
-        await collection?.add({
-            ids: [path],
-            documents: [content],
-            metadatas: [{ path, ref: afterSha }],
-        });
+        await ingestTextIntoChroma(
+            "secondbrain",
+            path,
+            content,
+            { ref: afterSha }
+        )
+
+        // await collection?.add({
+        //     ids: [path],
+        //     documents: [content],
+        //     metadatas: [{ path, ref: afterSha }],
+        // });
     }
 
     return new Response("OK", { status: 200 });
