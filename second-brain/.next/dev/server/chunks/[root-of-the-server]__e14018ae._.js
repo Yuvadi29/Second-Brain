@@ -29,6 +29,12 @@ const mod = __turbopack_context__.x("next/dist/shared/lib/no-fallback-error.exte
 
 module.exports = mod;
 }),
+"[externals]/node:crypto [external] (node:crypto, cjs)", ((__turbopack_context__, module, exports) => {
+
+const mod = __turbopack_context__.x("node:crypto", () => require("node:crypto"));
+
+module.exports = mod;
+}),
 "[externals]/chromadb [external] (chromadb, esm_import)", ((__turbopack_context__) => {
 "use strict";
 
@@ -101,12 +107,6 @@ async function getOrCreateCollection(name) {
 }
 __turbopack_async_result__();
 } catch(e) { __turbopack_async_result__(e); } }, false);}),
-"[externals]/node:crypto [external] (node:crypto, cjs)", ((__turbopack_context__, module, exports) => {
-
-const mod = __turbopack_context__.x("node:crypto", () => require("node:crypto"));
-
-module.exports = mod;
-}),
 "[project]/lib/chunkAndIngest.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
@@ -153,100 +153,63 @@ async function ingestTextIntoChroma(collectionName, filePath, text, metadata = {
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["registerServerReference"])(ingestTextIntoChroma, "781585da4d2035e29ea58d13b2350882139d769c50", null);
 __turbopack_async_result__();
 } catch(e) { __turbopack_async_result__(e); } }, false);}),
-"[project]/app/api/github/webhook/route.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
+"[project]/app/api/injest/test/route.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
 return __turbopack_context__.a(async (__turbopack_handle_async_dependencies__, __turbopack_async_result__) => { try {
 
+// app/api/dev/ingest-upi/route.ts
 __turbopack_context__.s([
     "POST",
     ()=>POST,
     "runtime",
     ()=>runtime
 ]);
-var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chromaClient$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/chromaClient.ts [app-route] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chunkAndIngest$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/chunkAndIngest.ts [app-route] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$externals$5d2f$crypto__$5b$external$5d$__$28$crypto$2c$__cjs$29$__ = __turbopack_context__.i("[externals]/crypto [external] (crypto, cjs)");
 var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
-    __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chromaClient$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__,
     __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chunkAndIngest$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__
 ]);
-[__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chromaClient$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chunkAndIngest$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__] = __turbopack_async_dependencies__.then ? (await __turbopack_async_dependencies__)() : __turbopack_async_dependencies__;
-;
-;
+[__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chunkAndIngest$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__] = __turbopack_async_dependencies__.then ? (await __turbopack_async_dependencies__)() : __turbopack_async_dependencies__;
 ;
 const runtime = "nodejs";
-const GH_SECRET = process.env.GITHUB_WEBHOOK_SECRET;
-const OWNER = process.env.GITHUB_REPO_OWNER;
-const REPO = process.env.GITHUB_REPO_NAME;
-const GITHUB_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
-function verifySignature(payload, signature) {
-    if (!signature) return false;
-    const hmac = __TURBOPACK__imported__module__$5b$externals$5d2f$crypto__$5b$external$5d$__$28$crypto$2c$__cjs$29$__["default"].createHmac("sha256", GH_SECRET);
-    const digest = `sha256=${hmac.update(payload).digest('hex')}`;
-    return __TURBOPACK__imported__module__$5b$externals$5d2f$crypto__$5b$external$5d$__$28$crypto$2c$__cjs$29$__["default"]?.timingSafeEqual(Buffer?.from(digest), Buffer?.from(signature));
-}
-async function fetchFileContent(path, ref) {
-    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURIComponent(path)}?ref=${ref}`, {
-        headers: {
-            Authorization: `Bearer ${GITHUB_TOKEN}`,
-            Accept: "application/vnd.github.v3.raw"
-        }
+const UPI_TEXT = `
+### Traditional Approach for Payments in India UPI
+Traditional System for Payments in India work on the basis of banks. Users must have a bank account to make payments. They can have their accounts in any of the banks like ICICI, HDFC, SBI, HSBC, etc. 
+All these banks are regulated by RBI which is the Reserve Bank of India
+
+Each user has the following unique details in their bank, irrespective of the bank that they have their account in:
+\t- Account Number
+\t- Bank Name
+\t- Branch Code
+\t- IFSC Code
+Say, me as a user want to make a payment to Anil. So, to make the transaction, i will need the above details of Anil. Here, I will need the Account Details of Anil to make the transaction complete, without that there will not be any transaction done.
+Now, to make the payment, there are different services that are used. 
+\t- For Small transaction like 1000, 2000, etc we use IMPS which is Immediate Payment Service
+\t- For Medium Transaction like 50,000 , 1,00,000 etc we use NEFT which is National Electronic Funds Transfer. Here the catch is that it will take hours to get reflected into the receivers account. For this , people usually save up a screenshot of their transaction stating that user 1 has already payed, and it will take some hours for the amount to get reflected on user 2's bank.
+\t- For High Transaction like 5,00,000 , 20,00,000 etc RTGS which is Realtime-Gross-Settlement
+This is the traditional approach on the payment transfer.
+***How UPI Revolutionized the Way Payment Works ?
+First of all UPI stands for Unified Payment Interface. It is an instant real-time payment system developed by NPCI which is National Payments Corporation of India. 
+The way UPI is changing the way things work is by saying 'Ok, we don't want to go through all the traditional of money transfer, we want to change it and make it very simple '. This is how it works:
+NPCI acts as the Payment Infrastructure. 
+The APIs provided by NPCI are not publicly available, hence not everyone can communicate with NPCI network.
+NPCI has a list of trusted banks with which it communicates. It includes HDFC, ICICI, SBI, etc. Meaning, only these banks can communicate with the NPCI's API. 
+ Now say, user wants to make a transaction, he or she cannot directly communicate with the api of NPCI. So, for that we have PSP (Payment Service Provider). This is basically a third party entity that facilitates electronic payment transactions for merchants. Some of the Customer PSPs are GooglePay, PhonePay, SuperMoney etc. 
+Now here what we do is, we have a QR Code . We scan it to make the payments. We need an address to make the payments. QR Code contains the VPA of that user. VPA stands for Virutal Payment Address. It works like username@handle. 
+Now say i want to make the payment from aditya@hdfc to anil@icici. I cannot directly go to NPCI as it only communicates with the trusted banks. So what happens is the PSP calls the banks with which it has its tie up. Say i am using GooglePay which has the tieup to HDFC Bank, it will communicate with the HDFC Bank for the transaction.
+While making the payment, it would create an intent which would be like:
+\tfrom:aditya@hdfc
+\tto:anil@icici
+\tamount: 5000
+Now this payment request goes to HDFC Bank, which then sends it to NPCI asking for the payment from aditya to anil of Rs 5000. 
+NPCI then asks if the amount is available in the sender's bank, that is when we get a screen on putting the PIN for the payment.  Once the amount is debited, it then sends a notification to user that the amount has been debited. NPCI now sends a request to the receiver's bank asking to credit the amount. If the server is busy, it will fail to response. That is when we get a notification that the receiver's server is busy. If it is not busy, the amount will be credited to the user2 and they will receive a message of credit.
+NPCI has just made this possible using the from and to VPA(Virtual Payment Address).
+`;
+async function POST() {
+    await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chunkAndIngest$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["ingestTextIntoChroma"])("secondbrain", "knowledge/upi-payments.md", UPI_TEXT, {
+        source: "dev-test"
     });
-    if (res.status === 404) return null;
-    if (!res.ok) {
-        console.error("GitHub fetch error: ", res.status, await res.text());
-        return null;
-    }
-    return await res.text();
-}
-async function POST(req) {
-    const rawBody = await req.text();
-    const signature = req.headers.get("x-hub-signature-256");
-    if (!verifySignature(rawBody, signature)) {
-        return new Response("Invalid signature", {
-            status: 401
-        });
-    }
-    const event = req.headers.get("x-github-event");
-    if (event !== "push") {
-        return new Response("Ignored", {
-            status: 204
-        });
-    }
-    const payload = JSON.parse(rawBody);
-    const afterSha = payload?.after;
-    const commits = payload?.commits ?? [];
-    const touchedFiles = [];
-    for (const c of commits){
-        for (const f of [
-            ...c.added,
-            ...c.modified
-        ]){
-            if (typeof f === "string" && f.startsWith("knowledge/")) {
-                touchedFiles?.push(f);
-            }
-        }
-    }
-    if (touchedFiles?.length === 0) {
-        return new Response("No knowledge files changed", {
-            status: 200
-        });
-    }
-    const collection = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chromaClient$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getOrCreateCollection"])("secondbrain");
-    for (const path of touchedFiles){
-        const content = await fetchFileContent(path, afterSha);
-        if (!content) continue;
-        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$chunkAndIngest$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["ingestTextIntoChroma"])("secondbrain", path, content, {
-            ref: afterSha
-        });
-    // await collection?.add({
-    //     ids: [path],
-    //     documents: [content],
-    //     metadatas: [{ path, ref: afterSha }],
-    // });
-    }
-    return new Response("OK", {
+    return new Response("Ingested UPI doc", {
         status: 200
     });
 }
@@ -254,4 +217,4 @@ __turbopack_async_result__();
 } catch(e) { __turbopack_async_result__(e); } }, false);}),
 ];
 
-//# sourceMappingURL=%5Broot-of-the-server%5D__01554f8d._.js.map
+//# sourceMappingURL=%5Broot-of-the-server%5D__e14018ae._.js.map

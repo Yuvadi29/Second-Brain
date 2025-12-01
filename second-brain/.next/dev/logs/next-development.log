@@ -1,1 +1,3 @@
 [00:00:00.548] Server  LOG      ✓ Ready in 376ms
+[00:01:45.516] Server  LOG     [dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[00:06:48.790] Server  LOG     Ingested 5 chunks from knowledge/upi-payments.md
