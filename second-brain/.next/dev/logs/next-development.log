@@ -1,3 +1,8 @@
 [00:00:00.548] Server  LOG      ✓ Ready in 376ms
 [00:01:45.516] Server  LOG     [dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
 [00:06:48.790] Server  LOG     Ingested 5 chunks from knowledge/upi-payments.md
+[00:08:10.596] Server  LOG     [dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[00:08:10.601] Server  LOG     [webhook] received {}
+[00:08:10.601] Server  LOG     [webhook] touched knowledge files: []
+[00:08:25.156] Server  LOG     [webhook] received {}
+[00:08:25.156] Server  LOG     [webhook] touched knowledge files: []
