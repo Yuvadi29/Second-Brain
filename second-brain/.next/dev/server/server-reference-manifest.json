@@ -1,5 +1,21 @@
 {
-  "node": {},
+  "node": {
+    "00530551a2de306759bbaa84d6f1c4b8ee8abdec63": {
+      "workers": {
+        "app/chat/page": {
+          "moduleId": "[project]/.next-internal/server/app/chat/page/actions.js { ACTIONS_MODULE0 => \"[project]/lib/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "invalidateRouterCache",
+          "filename": "lib/actions.ts"
+        }
+      },
+      "layer": {
+        "app/chat/page": "action-browser"
+      },
+      "filename": "lib/actions.ts",
+      "exportedName": "invalidateRouterCache"
+    }
+  },
   "edge": {},
   "encryptionKey": "ZMQSbeRMlU47nDpVTUqOsl4ip1Z7fz04ZptMnNFLQBU="
 }

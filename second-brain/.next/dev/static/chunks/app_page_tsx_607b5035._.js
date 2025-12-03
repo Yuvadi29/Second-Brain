@@ -3,8 +3,11 @@
     chunks: [
   "static/chunks/node_modules_zod_8f2f46a7._.js",
   "static/chunks/node_modules_ai_dist_index_mjs_a7281a1b._.js",
-  "static/chunks/node_modules_04e6dd29._.js",
-  "static/chunks/app_page_tsx_dda9881a._.js"
+  "static/chunks/node_modules_micromark-core-commonmark_dev_lib_fc41dd51._.js",
+  "static/chunks/node_modules_refractor_lang_ce18cb0d._.js",
+  "static/chunks/node_modules_refractor_lib_aef58dd3._.js",
+  "static/chunks/node_modules_408ebf11._.js",
+  "static/chunks/app_a9c145f6._.js"
 ],
     source: "dynamic"
 });
