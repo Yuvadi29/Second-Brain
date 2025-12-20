@@ -1,177 +1,149 @@
 "use client";
 
-import { UIMessage, useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
-import { useState, useRef, useEffect } from "react";
-import Markdown from "react-markdown";
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import TypingIndicator from "./components/TypingIndicator";
+import { motion } from "framer-motion";
+import { Button } from "@/app/components/ui/Button";
+import { Card } from "@/app/components/ui/Card";
+import { Brain, Search, Clock, Shield, ArrowRight, Github } from "lucide-react";
+import Link from "next/link";
 
-export default function ChatPage() {
-  const [input, setInput] = useState("");
-
-  const { messages, sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({
-      api: '/api/chat'
-    }),
-  });
-
-  const bottomRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-    await sendMessage({ text: input });
-    setInput("");
+export default function LandingPage() {
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
   };
 
-  const isLoading = status === "submitted" || status === "streaming";
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white">
-      <header className="px-6 py-4 border-b border-white/10 backdrop-blur-sm bg-black/20 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-semibold flex items-center gap-2">
-            <span className="text-2xl">🧠</span>
-            Second Brain
-          </h1>
-          <div className="text-sm text-white/50">
-            {messages.length > 0 && `${messages.length} message${messages.length > 1 ? 's' : ''}`}
+    <div className="relative min-h-screen overflow-hidden bg-black selection:bg-blue-500/30">
+      {/* Background Orbs */}
+      <div className="absolute top-0 -left-4 w-72 h-72 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
+      <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
+      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
+
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-black/50 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2 group cursor-pointer">
+            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center group-hover:rotate-12 transition-transform">
+              <Brain className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-bold text-xl tracking-tight">Second Brain</span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <Link href="https://github.com" target="_blank">
+              <Button variant="ghost" size="icon">
+                <Github className="w-5 h-5" />
+              </Button>
+            </Link>
+            <Link href="/chat">
+              <Button variant="primary" size="sm">
+                Get Started
+              </Button>
+            </Link>
           </div>
         </div>
-      </header>
+      </nav>
 
-      <main className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-fadeIn">
-              <div className="text-6xl mb-6">💡</div>
-              <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Welcome to Your Second Brain
-              </h2>
-              <p className="text-white/60 max-w-md mb-8">
-                Ask me anything about your knowledge base. I'll search through your notes and provide answers with source citations.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
-                {[
-                  "What are my recent notes about?",
-                  "Summarize my thoughts on...",
-                  "Find information about...",
-                  "What do I know about..."
-                ].map((suggestion, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setInput(suggestion)}
-                    className="px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all text-sm text-left"
-                  >
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
+      {/* Hero Section */}
+      <main className="relative pt-32 pb-20 px-6">
+        <div className="max-w-7xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <span className="inline-block px-4 py-1.5 mb-6 rounded-full border border-blue-500/20 bg-blue-500/10 text-blue-400 text-sm font-medium">
+              Revolutionize Your Knowledge Management
+            </span>
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8">
+              Your <span className="text-gradient">Second Brain</span>,<br />
+              Powered by AI.
+            </h1>
+            <p className="max-w-2xl mx-auto text-zinc-400 text-lg md:text-xl mb-10 leading-relaxed">
+              Connect your notes, documents, and thoughts. Our AI processes your personal knowledge base to provide instant answers with accurate citations.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/chat">
+                <Button size="lg" className="rounded-2xl group px-8">
+                  Open Your Brain
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+              <Button variant="secondary" size="lg" className="rounded-2xl px-8">
+                View Documentation
+              </Button>
             </div>
-          )}
+          </motion.div>
 
-          {messages.map((m, idx) => (
-            <div
-              key={m.id}
-              className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} animate-fadeIn`}
-              style={{ animationDelay: `${idx * 0.05}s` }}
-            >
-              <div className={`max-w-[85%] ${m.role === "user" ? "ml-auto" : "mr-auto"}`}>
-                <div className={`px-5 py-3 rounded-2xl ${m.role === "user"
-                  ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20"
-                  : "bg-white/5 backdrop-blur-sm text-white border border-white/10"
-                  }`}>
-                  {m.parts.map((p, i) => (
-                    p.type === "text" ? (
-                      <div key={i} className="prose prose-invert prose-sm max-w-none">
-                        <Markdown
-                          components={{
-                            code({ node, inline, className, children, ...props }: any) {
-                              const match = /language-(\w+)/.exec(className || '');
-                              return !inline && match ? (
-                                <SyntaxHighlighter
-                                  style={vscDarkPlus}
-                                  language={match[1]}
-                                  PreTag="div"
-                                  className="rounded-lg my-2"
-                                  {...props}
-                                >
-                                  {String(children).replace(/\n$/, '')}
-                                </SyntaxHighlighter>
-                              ) : (
-                                <code className="bg-white/10 px-1.5 py-0.5 rounded text-sm" {...props}>
-                                  {children}
-                                </code>
-                              );
-                            },
-                            p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                            ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
-                            ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
-                            li: ({ children }) => <li className="text-white/90">{children}</li>,
-                            strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
-                            a: ({ children, href }) => (
-                              <a href={href} className="text-blue-400 hover:text-blue-300 underline" target="_blank" rel="noopener noreferrer">
-                                {children}
-                              </a>
-                            ),
-                          }}
-                        >
-                          {p.text}
-                        </Markdown>
-                      </div>
-                    ) : null
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {isLoading && (
-            <div className="flex justify-start animate-fadeIn">
-              <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-                <TypingIndicator />
-              </div>
-            </div>
-          )}
-
-          <div ref={bottomRef} />
+          {/* Feature Grid */}
+          <motion.div
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-32"
+          >
+            {[
+              {
+                icon: <Search className="w-6 h-6 text-blue-400" />,
+                title: "Semantic Search",
+                description: "Find information across all your notes using natural language, not just keywords."
+              },
+              {
+                icon: <Clock className="w-6 h-6 text-purple-400" />,
+                title: "Instant Retrieval",
+                description: "Get answers to your questions in seconds, backed by your own data sources."
+              },
+              {
+                icon: <Shield className="w-6 h-6 text-pink-400" />,
+                title: "Privacy First",
+                description: "Your knowledge base stays yours. Secure storage and encrypted processing."
+              }
+            ].map((feature, i) => (
+              <motion.div key={i} variants={item}>
+                <Card className="h-full text-left">
+                  <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-6">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
+                  <p className="text-zinc-400 leading-relaxed">
+                    {feature.description}
+                  </p>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </main>
 
-      <form onSubmit={onSubmit} className="p-4 border-t border-white/10 bg-black/40 backdrop-blur-md sticky bottom-0">
-        <div className="max-w-4xl mx-auto flex gap-3">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask your Second Brain anything..."
-            disabled={isLoading}
-            className="flex-1 px-5 py-3 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-white/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-          />
-          <button
-            type="submit"
-            disabled={isLoading || !input.trim()}
-            className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
-          >
-            {isLoading ? (
-              <span className="flex items-center gap-2">
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                Thinking...
-              </span>
-            ) : (
-              "Send"
-            )}
-          </button>
+      {/* Footer */}
+      <footer className="mt-20 border-t border-white/5 py-12 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:row items-center justify-between gap-6">
+          <div className="flex items-center gap-2">
+            <Brain className="w-5 h-5 text-blue-500" />
+            <span className="font-semibold">Second Brain</span>
+          </div>
+          <p className="text-sm text-zinc-500">
+            &copy; 2025 Second Brain. Built for the modern thinker.
+          </p>
+          <div className="flex items-center gap-6">
+            <Link href="#" className="text-zinc-500 hover:text-white transition-colors">Privacy</Link>
+            <Link href="#" className="text-zinc-500 hover:text-white transition-colors">Terms</Link>
+            <Link href="#" className="text-zinc-500 hover:text-white transition-colors">Contact</Link>
+          </div>
         </div>
-      </form>
+      </footer>
     </div>
   );
 }
+

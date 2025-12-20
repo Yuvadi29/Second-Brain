@@ -1,0 +1,46 @@
+import { ObjectId } from "mongodb"
+import clientPromise from "./mongodb";
+
+export type ChatSession = {
+    _id: ObjectId,
+    title: string;
+    createdAt: Date;
+    updatedAt: Date;
+};
+
+export async function getChatSessions() {
+    const client = await clientPromise;
+    const db = client.db("secondbrain");
+
+    return db.collection<ChatSession>("sessions")
+        .find({})
+        .sort({ updatedAt: -1 })
+        .toArray();
+}
+
+export async function createChatSession() {
+    const client = await clientPromise;
+    const db = client.db("secondbrain");
+
+    const now = new Date();
+
+    const res = await db.collection("sessions").insertOne({
+        title: "New Chat",
+        createdAt: now,
+        updatedAt: now,
+    });
+
+    return {
+        _id: res.insertedId,
+        title: "New Chat",
+    };
+}
+
+export async function getChatSessionById(id: string) {
+    const client = await clientPromise;
+    const db = client.db("secondbrain");
+
+    return db.collection("sessions").findOne({
+        _id: new ObjectId(id),
+    });
+}
