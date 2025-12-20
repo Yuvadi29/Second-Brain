@@ -17,14 +17,38 @@ import { useSearchParams } from "next/navigation";
 export default function ChatSessionPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const [input, setInput] = useState("");
-    const { messages, sendMessage, status } = useChat({
+    const { messages, setMessages, sendMessage, status } = useChat({
         transport: new DefaultChatTransport({
-            api: '/api/chat'
+            api: `/api/chat?sessionId=${id}`
         }),
         body: {
             sessionId: id
         }
     } as any);
+
+    const [historyLoaded, setHistoryLoaded] = useState(false);
+
+    useEffect(() => {
+        async function fetchHistory() {
+            try {
+                const res = await fetch(`/api/messages/${id}`);
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    const mappedMessages = data.map((m: any) => ({
+                        id: m._id,
+                        role: m.role as any,
+                        parts: [{ type: "text" as const, text: m.content }],
+                    }));
+                    setMessages(mappedMessages);
+                }
+                setHistoryLoaded(true);
+            } catch (error) {
+                console.error("Failed to fetch history:", error);
+                setHistoryLoaded(true);
+            }
+        }
+        fetchHistory();
+    }, [id, setMessages]);
 
     const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -35,7 +59,7 @@ export default function ChatSessionPage({ params }: { params: Promise<{ id: stri
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!input.trim() || status === "submitted" || status === "streaming") return;
-        await sendMessage({ text: input });
+        await sendMessage({ text: input, metadata: { sessionId: id } });
         setInput("");
     };
 
@@ -46,13 +70,14 @@ export default function ChatSessionPage({ params }: { params: Promise<{ id: stri
     const sentRef = useRef(false);
 
     useEffect(() => {
-        if(firstQuery && !sentRef.current){
+        if (historyLoaded && firstQuery && !sentRef.current && messages.length === 0) {
             sentRef.current = true;
             sendMessage({
-                text: firstQuery
+                text: firstQuery,
+                metadata: { sessionId: id }
             })
         }
-    }, [firstQuery, sendMessage]);
+    }, [historyLoaded, firstQuery, sendMessage, messages.length, id]);
 
     return (
         <div className="flex flex-col h-screen bg-[#0a0a0a]">
@@ -162,7 +187,7 @@ export default function ChatSessionPage({ params }: { params: Promise<{ id: stri
             </main>
 
             {/* Input Area */}
-            <div className="p-6 bg-gradient-to-t from-black via-black to-transparent">
+            <div className="p-6 bg-linear-to-t from-black via-black to-transparent">
                 <form onSubmit={onSubmit} className="max-w-3xl mx-auto relative group">
                     <Input
                         value={input}
