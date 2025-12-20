@@ -1,4 +1,0 @@
-{
-  "/api/github/webhook/route": "app/api/github/webhook/route.js",
-  "/page": "app/page.js"
-}
