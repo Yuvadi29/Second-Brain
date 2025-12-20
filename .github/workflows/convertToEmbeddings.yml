@@ -3,7 +3,7 @@ name: Ingest Knowledge Base
 on:
   push:
     paths:
-      - "**/knowledge/**"
+      - "knowledge/**"
 
 jobs:
   ingest:
