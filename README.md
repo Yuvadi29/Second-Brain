@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Second Brain - AI-Powered Knowledge Management
 
-## Getting Started
+Second Brain is a modern, high-performance personal knowledge management system. It allows you to connect your notes, documents, and thoughts into a unified, AI-powered interface. Using Retrieval-Augmented Generation (RAG), it provides instant answers to your questions based on your own data, complete with accurate citations.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Semantic Search**: Find information across your entire knowledge base using natural language.
+- **Instant Retrieval**: Get answers in seconds, backed by your local or remote documents.
+- **Persistence**: Chat history is saved to MongoDB, allowing you to pick up where you left off.
+- **RAG Engine**: Powered by LangChain and ChromaDB for efficient document ingestion and retrieval.
+- **Privacy First**: Your data remains yours. Processes are designed for secure, local-first workflows where possible.
+- **Modern UI**: A sleek, reactive interface built with Next.js, Framer Motion, and Tailwind CSS.
+
+## 🛠️ Tech Stack
+
+- **Frontend**: [Next.js 15+](https://nextjs.org), [React 19](https://react.dev), [Tailwind CSS](https://tailwindcss.com), [Framer Motion](https://www.framer.com/motion/)
+- **AI/LLM**: [LangChain](https://js.langchain.com), [Google Gemini API](https://ai.google.dev), [Vercel AI SDK](https://sdk.vercel.ai)
+- **Database**: [MongoDB](https://www.mongodb.com) (Session storage), [ChromaDB](https://www.trychroma.com) (Vector store)
+- **ORM**: [Prisma](https://www.prisma.io)
+- **Deployment**: Vercel
+
+## 🏁 Getting Started
+
+### Prerequisites
+
+- Node.js 20+
+- MongoDB instance (local or Atlas)
+- ChromaDB instance
+- Google Gemini API Key
+
+### Environment Variables
+
+Create a `.env` file in the root directory and add the following:
+
+```env
+MONGODB_URI=your_mongodb_uri
+GOOGLE_GENERAI_API_KEY=your_gemini_api_key
+CHROMA_URL=your_chromadb_url
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/Yuvadi29/Second-Brain.git
+    cd second-brain
+    ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
 
-## Learn More
+3.  **Run the development server**:
+    ```bash
+    npm run dev
+    ```
 
-To learn more about Next.js, take a look at the following resources:
+4.  **Open the app**:
+    Navigate to [http://localhost:3000](http://localhost:3000).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🧠 How it Works
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1.  **Ingestion**: Place your documents (PDF, Markdown, Text) in the `knowledge/` directory.
+2.  **Processing**: The system chunks the text, generates embeddings, and stores them in ChromaDB.
+3.  **Retrieval**: When you ask a question, the system finds the most relevant chunks.
+4.  **Generation**: The LLM uses the retrieved context to generate a precise answer with citations.
 
-## Deploy on Vercel
+## ⚙️ Automated Knowledge Ingestion with GitHub Actions
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Second Brain includes a GitHub Actions workflow that automatically ingests new documents whenever you push changes to the `knowledge/` directory.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### How It Works
+
+The `convertToEmbeddings.yml` workflow:
+
+- **Triggers** on any push to the `knowledge/` directory
+- **Detects** all changed files automatically
+- **Sends** files to the ingestion API endpoint
+- **Embeds** content into ChromaDB for instant searching
+
+### Setup
+
+1. Add your ingestion API key to GitHub Secrets:
+   - Go to your repository Settings → Secrets and variables → Actions
+   - Create a new secret named `INGEST_API_KEY`
+
+2. Update the ingestion API URL in `.github/workflows/convertToEmbeddings.yml`:
+   ```yaml
+   INGEST_API_URL: your_api_endpoint_url
+   ```
+
+3. Ensure your ingestion server is running and accessible
+
+4. Push changes to the `knowledge/` directory to trigger the workflow
+
+### Monitoring
+
+- Check the **Actions** tab in your GitHub repository to see workflow execution logs
+- Each run shows which files were processed and any ingestion status
+
+## 📖 Documentation
+
+For a more detailed guide on setup, architecture, and extension, visit the [Documentation Page](http://localhost:3000/docs) (available locally).

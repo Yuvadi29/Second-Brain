@@ -80,9 +80,11 @@ export default function LandingPage() {
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Button variant="secondary" size="lg" className="rounded-2xl px-8 cursor-pointer">
-                View Documentation
-              </Button>
+              <Link href='/docs'>
+                <Button variant="secondary" size="lg" className="rounded-2xl px-8 cursor-pointer">
+                  View Documentation
+                </Button>
+              </Link>
             </div>
           </motion.div>
 
