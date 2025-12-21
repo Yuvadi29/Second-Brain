@@ -3,7 +3,7 @@ import { google } from "@ai-sdk/google";
 import { streamText, convertToModelMessages } from "ai";
 
 import { getOrCreateCollection } from "@/lib/chromaClient";
-import { saveMessage } from "@/lib/chatMessages";
+import { Citation, saveMessage } from "@/lib/chatMessages";
 
 export const runtime = "nodejs";
 export const maxDuration = 40;
@@ -18,7 +18,7 @@ type TextPart = {
 type ChromaMetadata = {
   filePath?: string;
   fileHash?: string;
-  chunkIndex?:string;
+  chunkIndex?: string;
 };
 
 export async function POST(req: NextRequest) {
@@ -69,13 +69,24 @@ export async function POST(req: NextRequest) {
     include: ["documents", "metadatas"],
   });
 
-  const docs: string[] = ragResults.documents?.[0] ?? [];
-  const metas: ChromaMetadata[] = ragResults.metadatas?.[0] ?? [];
+  const rawDocs = ragResults.documents?.[0] ?? [];
+  const docs: string[] = rawDocs.filter(
+    (doc): doc is string => typeof doc === "string"
+  );
 
-  const citations = metas.map((m: ChromaMetadata) => ({
-    filePath: m.filePath ?? "unknown",
-    chunkIndex: m.chunkIndex ?? 0,
-  }));
+  const rawMetas = ragResults.metadatas?.[0] ?? [];
+  const metas: ChromaMetadata[] = rawMetas.filter(
+    (m): m is ChromaMetadata => m !== null
+  );
+
+const citations: Citation[] = metas.map((m) => ({
+  filePath: m.filePath ?? "unknown",
+  chunkIndex:
+    typeof m.chunkIndex === "number"
+      ? m.chunkIndex
+      : Number(m.chunkIndex ?? 0),
+}));
+
 
   const context = docs
     .map(
