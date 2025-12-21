@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     "secondbrain",
     filePath,
     content,
-    { fileHash }
+    { fileHash: parseInt(fileHash, 16) }
   );
 
   return Response.json({ status: "ingested", filePath });
