@@ -357,7 +357,7 @@ export default function DocsPage() {
                                     <p><span className="text-pink-400">on:</span></p>
                                     <p className="ml-2"><span className="text-pink-400">push:</span></p>
                                     <p className="ml-4"><span className="text-pink-400">paths:</span></p>
-                                    <p className="ml-6">- <span className="text-green-400">"knowledge/**"</span></p>
+                                    <p className="ml-6">- <span className="text-green-400">&quot;knowledge/**&quot;</span></p>
                                     <p><span className="text-pink-400">jobs:</span></p>
                                     <p className="ml-2"><span className="text-pink-400">ingest:</span></p>
                                     <p className="ml-4"><span className="text-pink-400">runs-on:</span> ubuntu-latest</p>

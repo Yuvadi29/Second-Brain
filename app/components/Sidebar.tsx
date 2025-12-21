@@ -36,7 +36,7 @@ export default async function ChatSidebar() {
                         No recent sessions
                     </div>
                 ) : (
-                    sessions.map((s: any) => (
+                    sessions.map((s) => (
                         <Link
                             key={s._id.toString()}
                             href={`/chat/${s._id.toString()}`}

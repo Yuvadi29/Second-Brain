@@ -7,7 +7,7 @@ export async function ingestTextIntoChroma(
     collectionName: string,
     filePath: string,
     text: string,
-    metadata: Record<string, any> = {}
+    metadata: Record<string, number> = {}
 ) {
     const splitter = new RecursiveCharacterTextSplitter({
         chunkSize: 1200,

@@ -10,10 +10,26 @@ export const maxDuration = 40;
 
 const COLLECTION_NAME = "secondbrain";
 
+type TextPart = {
+  type: "text";
+  text: string;
+}
+
+type ChromaMetadata = {
+  filePath?: string;
+  fileHash?: string;
+  chunkIndex?:string;
+};
+
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
-  const messages = body.messages;
+  const messages = body.messages as {
+    parts: TextPart[];
+    metadata?: {
+      sessionId?: string
+    };
+  }[];
   const lastMessage = messages?.[messages.length - 1];
 
   // ✅ sessionId extraction (Root Body > Message Metadata > URL Param)
@@ -24,7 +40,7 @@ export async function POST(req: NextRequest) {
     undefined;
 
   const userMessage =
-    lastMessage?.parts?.find((p: any) => p.type === "text")?.text;
+    lastMessage?.parts?.find((p): p is TextPart => p.type === "text")?.text;
 
   if (!sessionId || !messages || !userMessage?.trim()) {
     console.error("INVALID PAYLOAD:", JSON.stringify(body, null, 2));
@@ -53,11 +69,11 @@ export async function POST(req: NextRequest) {
     include: ["documents", "metadatas"],
   });
 
-  const docs = ragResults.documents?.[0] ?? [];
-  const metas = ragResults.metadatas?.[0] ?? [];
+  const docs: string[] = ragResults.documents?.[0] ?? [];
+  const metas: ChromaMetadata[] = ragResults.metadatas?.[0] ?? [];
 
-  const citations = metas.map((m: any) => ({
-    filePath: m.filePath ?? m.path ?? "unknown",
+  const citations = metas.map((m: ChromaMetadata) => ({
+    filePath: m.filePath ?? "unknown",
     chunkIndex: m.chunkIndex ?? 0,
   }));
 

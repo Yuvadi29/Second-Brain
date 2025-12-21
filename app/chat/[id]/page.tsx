@@ -14,15 +14,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { use } from "react";
 import { useSearchParams } from "next/navigation";
 
-type Citation = {
-  filePath: string;
-  chunkIndex: number;
-};
-
-type MessageWithCitations = {
-  citations?: Citation[];
-};
-
 export default function ChatSessionPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const [input, setInput] = useState("");
@@ -147,7 +138,7 @@ export default function ChatSessionPage({ params }: { params: Promise<{ id: stri
                                                 <div key={i} className="prose prose-sm prose-invert max-w-none">
                                                     <Markdown
                                                         components={{
-                                                            code({ node, inline, className, children, ...props }: any) {
+                                                            code({ inline, className, children, ...props }: any) {
                                                                 const match = /language-(\w+)/.exec(className || '');
                                                                 return !inline && match ? (
                                                                     <SyntaxHighlighter
