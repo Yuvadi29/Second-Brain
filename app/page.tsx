@@ -40,13 +40,13 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link href="https://github.com" target="_blank">
+            <Link href="https://github.com/Yuvadi29/Second-Brain" target="_blank">
               <Button variant="ghost" size="icon">
-                <Github className="w-5 h-5" />
+                <Github className="w-5 h-5 cursor-pointer" />
               </Button>
             </Link>
             <Link href="/chat">
-              <Button variant="primary" size="sm">
+              <Button variant="primary" size="sm" className="cursor-pointer">
                 Get Started
               </Button>
             </Link>
@@ -73,14 +73,14 @@ export default function LandingPage() {
               Connect your notes, documents, and thoughts. Our AI processes your personal knowledge base to provide instant answers with accurate citations.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 ">
               <Link href="/chat">
-                <Button size="lg" className="rounded-2xl group px-8">
+                <Button size="lg" className="rounded-2xl group px-8 cursor-pointer">
                   Open Your Brain
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Button variant="secondary" size="lg" className="rounded-2xl px-8">
+              <Button variant="secondary" size="lg" className="rounded-2xl px-8 cursor-pointer">
                 View Documentation
               </Button>
             </div>
@@ -136,11 +136,11 @@ export default function LandingPage() {
           <p className="text-sm text-zinc-500">
             &copy; 2025 Second Brain. Built for the modern thinker.
           </p>
-          <div className="flex items-center gap-6">
+          {/* <div className="flex items-center gap-6">
             <Link href="#" className="text-zinc-500 hover:text-white transition-colors">Privacy</Link>
             <Link href="#" className="text-zinc-500 hover:text-white transition-colors">Terms</Link>
             <Link href="#" className="text-zinc-500 hover:text-white transition-colors">Contact</Link>
-          </div>
+          </div> */}
         </div>
       </footer>
     </div>

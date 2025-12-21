@@ -14,6 +14,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { use } from "react";
 import { useSearchParams } from "next/navigation";
 
+type Citation = {
+  filePath: string;
+  chunkIndex: number;
+};
+
+type MessageWithCitations = {
+  citations?: Citation[];
+};
+
 export default function ChatSessionPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const [input, setInput] = useState("");
@@ -201,7 +210,7 @@ export default function ChatSessionPage({ params }: { params: Promise<{ id: stri
                             type="submit"
                             size="icon"
                             disabled={isLoading || !input.trim()}
-                            className="h-10 w-10 rounded-xl"
+                            className="h-10 w-10 rounded-xl cursor-pointer"
                         >
                             <Send className="w-4 h-4" />
                         </Button>

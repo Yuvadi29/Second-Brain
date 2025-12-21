@@ -68,7 +68,7 @@ export default function ChatPage() {
         <Button
           type="submit"
           disabled={loading || !input.trim()}
-          className="absolute right-2 top-2 h-10 w-10 rounded-xl"
+          className="absolute right-2 top-2 h-10 w-10 rounded-xl cursor-pointer"
         >
           <Send className="w-4 h-4 bg-white" />
         </Button>
