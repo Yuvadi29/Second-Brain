@@ -79,13 +79,13 @@ export async function POST(req: NextRequest) {
     (m): m is ChromaMetadata => m !== null
   );
 
-const citations: Citation[] = metas.map((m) => ({
-  filePath: m.filePath ?? "unknown",
-  chunkIndex:
-    typeof m.chunkIndex === "number"
-      ? m.chunkIndex
-      : Number(m.chunkIndex ?? 0),
-}));
+  const citations: Citation[] = metas.map((m) => ({
+    filePath: m.filePath ?? "unknown",
+    chunkIndex:
+      typeof m.chunkIndex === "number"
+        ? m.chunkIndex
+        : Number(m.chunkIndex ?? 0),
+  }));
 
 
   const context = docs
@@ -123,7 +123,7 @@ ${context}`,
   ]);
 
   const result = streamText({
-    model: google("gemini-2.5-flash"),
+    model: google("gemini-1.5-flash"),
     messages: modelMessages,
 
     onFinish: async (event) => {

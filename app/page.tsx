@@ -3,8 +3,10 @@
 import { motion } from "framer-motion";
 import { Button } from "@/app/components/ui/Button";
 import { Card } from "@/app/components/ui/Card";
-import { Brain, Search, Clock, Shield, ArrowRight, Github } from "lucide-react";
+import { Brain, Search, Clock, Shield, ArrowRight, Github, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { HeroHighlight, Highlight } from "@/app/components/ui/HeroHighlight";
+import { WorkflowAnimation } from "@/app/components/WorkflowAnimation";
 
 export default function LandingPage() {
   const container = {
@@ -23,30 +25,27 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black selection:bg-blue-500/30">
-      {/* Background Orbs */}
-      <div className="absolute top-0 -left-4 w-72 h-72 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
-      <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
-      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
-
+    <div className="relative min-h-screen overflow-hidden bg-black selection:bg-blue-500/30 text-white">
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-black/50 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 group cursor-pointer">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center group-hover:rotate-12 transition-transform">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center group-hover:rotate-12 transition-transform shadow-[0_0_15px_rgba(79,70,229,0.5)]">
               <Brain className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl tracking-tight">Second Brain</span>
+            <span className="font-bold text-xl tracking-tight text-white/90">
+              Second <span className="text-indigo-500">Brain</span>
+            </span>
           </div>
 
           <div className="flex items-center gap-4">
             <Link href="https://github.com/Yuvadi29/Second-Brain" target="_blank">
-              <Button variant="ghost" size="icon">
-                <Github className="w-5 h-5 cursor-pointer" />
+              <Button variant="ghost" size="icon" className="hover:bg-white/10">
+                <Github className="w-5 h-5" />
               </Button>
             </Link>
             <Link href="/chat">
-              <Button variant="primary" size="sm" className="cursor-pointer">
+              <Button variant="primary" size="sm" className="cursor-pointer bg-indigo-600 hover:bg-indigo-700 shadow-[0_0_15px_rgba(79,70,229,0.3)]">
                 Get Started
               </Button>
             </Link>
@@ -55,70 +54,102 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <main className="relative pt-32 pb-20 px-6">
-        <div className="max-w-7xl mx-auto text-center">
+      <HeroHighlight>
+        <div className="max-w-4xl mx-auto text-center px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="inline-block px-4 py-1.5 mb-6 rounded-full border border-blue-500/20 bg-blue-500/10 text-blue-400 text-sm font-medium">
-              Revolutionize Your Knowledge Management
-            </span>
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8">
-              Your <span className="text-gradient">Second Brain</span>,<br />
-              Powered by AI.
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-6">
+              <Sparkles className="w-3 h-3" />
+              <span>Next-Gen Knowledge Management</span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-tight">
+              Unlock the Power of Your <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-b from-indigo-300 to-indigo-600">
+                Second Brain
+              </span>
             </h1>
-            <p className="max-w-2xl mx-auto text-zinc-400 text-lg md:text-xl mb-10 leading-relaxed">
-              Connect your notes, documents, and thoughts. Our AI processes your personal knowledge base to provide instant answers with accurate citations.
+            <p className="max-w-2xl mx-auto text-zinc-400 text-lg md:text-xl mb-10 leading-relaxed font-light">
+              Transform your scattered notes into a structured knowledge engine.
+              Our AI understands your context and surfaces insights instantly.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 ">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/chat">
-                <Button size="lg" className="rounded-2xl group px-8 cursor-pointer">
-                  Open Your Brain
+                <Button size="lg" className="rounded-full group px-8 bg-indigo-600 hover:bg-indigo-700 text-white border-none shadow-[0_0_20px_rgba(79,70,229,0.4)]">
+                  Launch Your Brain
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Link href='/docs'>
-                <Button variant="secondary" size="lg" className="rounded-2xl px-8 cursor-pointer">
-                  View Documentation
+              <Link href="/docs">
+                <Button variant="secondary" size="lg" className="rounded-full px-8 bg-white/5 hover:bg-white/10 border-white/10">
+                  Documentation
                 </Button>
               </Link>
             </div>
           </motion.div>
+        </div>
+      </HeroHighlight>
 
-          {/* Feature Grid */}
+      {/* Workflow Animation Section */}
+      <section className="py-24 px-6 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">How it works</h2>
+            <p className="text-zinc-400 max-w-xl mx-auto">
+              A seamless flow from ingestion to intelligent retrieval.
+            </p>
+          </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="flex justify-center"
+          >
+            <div className="w-full max-w-4xl border border-white/5 rounded-3xl overflow-hidden bg-zinc-900/50 backdrop-blur-sm p-4 md:p-8 shadow-2xl">
+              <WorkflowAnimation />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Feature Grid */}
+      <section className="py-24 px-6 bg-zinc-950/50">
+        <div className="max-w-7xl mx-auto">
           <motion.div
             variants={container}
             initial="hidden"
-            animate="show"
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-32"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
           >
             {[
               {
-                icon: <Search className="w-6 h-6 text-blue-400" />,
-                title: "Semantic Search",
-                description: "Find information across all your notes using natural language, not just keywords."
+                icon: <Search className="w-6 h-6 text-indigo-400" />,
+                title: "Semantic Understanding",
+                description: "Not just keyword matching. We understand the meaning behind your queries across all documents."
               },
               {
                 icon: <Clock className="w-6 h-6 text-purple-400" />,
-                title: "Instant Retrieval",
-                description: "Get answers to your questions in seconds, backed by your own data sources."
+                title: "Real-time Retrieval",
+                description: "Optimized vector search ensures your answers are generated in milliseconds, not minutes."
               },
               {
                 icon: <Shield className="w-6 h-6 text-pink-400" />,
-                title: "Privacy First",
-                description: "Your knowledge base stays yours. Secure storage and encrypted processing."
+                title: "Built-in Citations",
+                description: "Every answer comes with precise links to your original sources for complete transparency."
               }
             ].map((feature, i) => (
               <motion.div key={i} variants={item}>
-                <Card className="h-full text-left">
-                  <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-6">
+                <Card className="h-full bg-zinc-900/40 border-white/5 hover:border-indigo-500/50 transition-colors p-8">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-6 border border-indigo-500/20">
                     {feature.icon}
                   </div>
-                  <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                  <p className="text-zinc-400 leading-relaxed">
+                  <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                  <p className="text-zinc-400 leading-relaxed font-light">
                     {feature.description}
                   </p>
                 </Card>
@@ -126,23 +157,25 @@ export default function LandingPage() {
             ))}
           </motion.div>
         </div>
-      </main>
+      </section>
 
       {/* Footer */}
-      <footer className="mt-20 border-t border-white/5 py-12 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:row items-center justify-between gap-6">
+      <footer className="py-12 border-t border-white/5 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-2">
-            <Brain className="w-5 h-5 text-blue-500" />
-            <span className="font-semibold">Second Brain</span>
+            <div className="size-6 rounded bg-indigo-600 flex items-center justify-center">
+              <Brain className="w-3.5 h-3.5 text-white" />
+            </div>
+            <span className="font-bold tracking-tight">Second Brain</span>
           </div>
-          <p className="text-sm text-zinc-500">
-            &copy; 2025 Second Brain. Built for the modern thinker.
+          <p className="text-sm text-zinc-500 font-light">
+            &copy; 2025 Second Brain. Powered by Gemini.
           </p>
-          {/* <div className="flex items-center gap-6">
-            <Link href="#" className="text-zinc-500 hover:text-white transition-colors">Privacy</Link>
-            <Link href="#" className="text-zinc-500 hover:text-white transition-colors">Terms</Link>
-            <Link href="#" className="text-zinc-500 hover:text-white transition-colors">Contact</Link>
-          </div> */}
+          <div className="flex items-center gap-6">
+            <Link href="https://github.com/Yuvadi29/Second-Brain" className="text-zinc-500 hover:text-white transition-colors">
+              <Github className="w-5 h-5" />
+            </Link>
+          </div>
         </div>
       </footer>
     </div>

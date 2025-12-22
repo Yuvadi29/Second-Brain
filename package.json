@@ -11,8 +11,7 @@
   "dependencies": {
     "@ai-sdk/google": "^2.0.44",
     "@ai-sdk/react": "^2.0.105",
-    "@chroma-core/default-embed": "^0.1.9",
-    "@chroma-core/openai": "^0.1.8",
+    "@google/generative-ai": "^0.24.1",
     "@langchain/community": "^1.0.5",
     "@langchain/core": "^1.1.0",
     "@langchain/openai": "^1.1.3",
