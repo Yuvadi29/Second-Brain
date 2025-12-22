@@ -27,7 +27,7 @@ export async function ingestTextIntoChroma(
         })),
     });
 
-    console.log(`Ingested ${chunks?.length} chunks from ${filePath}`);
+w    // console.log(`Ingested ${chunks?.length} chunks from ${filePath}`);
 
 
 }

@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
   const query = userMessage.trim();
 
   /* ---------------- SAVE USER MESSAGE ---------------- */
-  console.log(`[API] Attempting to save user message for session ${sessionId}`);
+  // console.log(`[API] Attempting to save user message for session ${sessionId}`);
   await saveMessage({
     sessionId,
     role: "user",
@@ -123,7 +123,7 @@ ${context}`,
   ]);
 
   const result = streamText({
-    model: google("gemini-1.5-flash"),
+    model: google("gemini-2.5-flash"),
     messages: modelMessages,
 
     onFinish: async (event) => {

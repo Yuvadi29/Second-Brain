@@ -6,7 +6,6 @@ import { Card } from "@/app/components/ui/Card";
 import { Brain, Search, Clock, Shield, ArrowRight, Github, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { HeroHighlight, Highlight } from "@/app/components/ui/HeroHighlight";
-import { WorkflowAnimation } from "@/app/components/WorkflowAnimation";
 
 export default function LandingPage() {
   const container = {
@@ -92,29 +91,6 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </HeroHighlight>
-
-      {/* Workflow Animation Section */}
-      <section className="py-24 px-6 relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">How it works</h2>
-            <p className="text-zinc-400 max-w-xl mx-auto">
-              A seamless flow from ingestion to intelligent retrieval.
-            </p>
-          </div>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="flex justify-center"
-          >
-            <div className="w-full max-w-4xl border border-white/5 rounded-3xl overflow-hidden bg-zinc-900/50 backdrop-blur-sm p-4 md:p-8 shadow-2xl">
-              <WorkflowAnimation />
-            </div>
-          </motion.div>
-        </div>
-      </section>
 
       {/* Feature Grid */}
       <section className="py-24 px-6 bg-zinc-950/50">

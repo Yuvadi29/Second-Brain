@@ -33,7 +33,7 @@ export async function saveMessage({
         const client = await clientPromise;
         const db = client.db("secondbrain");
 
-        console.log(`[DB] Saving ${role} message for session ${sessionId}...`);
+        // console.log(`[DB] Saving ${role} message for session ${sessionId}...`);
 
         const res = await db.collection("messages").insertOne({
             sessionId: new ObjectId(sessionId),
@@ -43,7 +43,7 @@ export async function saveMessage({
             createdAt: new Date(),
         });
 
-        console.log(`[DB] Successfully saved message with ID: ${res.insertedId}`);
+        // console.log(`[DB] Successfully saved message with ID: ${res.insertedId}`);
 
         // bump session updatedAt
         const updateRes = await db.collection("sessions").updateOne(
@@ -54,7 +54,7 @@ export async function saveMessage({
         if (updateRes.matchedCount === 0) {
             console.warn(`[DB] Warning: No session found with ID ${sessionId} to update.`);
         } else {
-            console.log(`[DB] Updated session timestamp for ${sessionId}`);
+            // console.log(`[DB] Updated session timestamp for ${sessionId}`);
         }
     } catch (error) {
         console.error(`[DB] Error saving message:`, error);

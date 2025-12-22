@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
   const existingHash = existing.metadatas?.[0]?.fileHash;
 
   if (existingHash === fileHash) {
-    console.log(`Skipping unchanged file: ${filePath}`);
+    // console.log(`Skipping unchanged file: ${filePath}`);
     return Response.json({ status: "skipped" });
   }
 
