@@ -21,6 +21,61 @@ type ChromaMetadata = {
   chunkIndex?: string;
 };
 
+const BLOCKED_PATTERNS = [
+  /bank/i,
+  /account number/i,
+  /ifsc/i,
+  /password/i,
+  /otp/i,
+  /credit card/i,
+  /debit card/i,
+  /ssn/i,
+  /aadhar/i,
+  /pan card/i,
+  /what is|who is|define|explain/i, // general knowledge
+  /ignore previous/i,
+  /system prompt/i,
+  /you are chatgpt/i,
+];
+
+function violatesInputPolicy(query: string): boolean {
+  return BLOCKED_PATTERNS.some((p) => p.test(query));
+}
+
+const SENSITIVE_CONTEXT_PATTERNS = [
+  /\b\d{12,16}\b/g,          // card-like numbers
+  /\b\d{9,12}\b/g,           // ids
+  /account number/i,
+  /ifsc/i,
+  /password/i,
+  /secret/i,
+  /token/i,
+];
+
+function sanitizeContext(text: string): string {
+  let sanitized = text;
+
+  for (const pattern of SENSITIVE_CONTEXT_PATTERNS) {
+    sanitized = sanitized.replace(pattern, "[REDACTED]");
+  }
+
+  return sanitized;
+}
+
+const OUTPUT_BLOCK_PATTERNS = [
+  /bank/i,
+  /account number/i,
+  /ifsc/i,
+  /password/i,
+  /credit card/i,
+  /\b\d{12,16}\b/,
+];
+
+function violatesOutputPolicy(text: string): boolean {
+  return OUTPUT_BLOCK_PATTERNS.some((p) => p.test(text));
+}
+
+
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
@@ -51,6 +106,16 @@ export async function POST(req: NextRequest) {
   }
 
   const query = userMessage.trim();
+
+  if (violatesInputPolicy(query)) {
+    return new Response(
+      JSON.stringify({
+        error: "This question is not allowed in your Second Brain.",
+      }),
+      { status: 403 }
+    );
+  }
+
 
   /* ---------------- SAVE USER MESSAGE ---------------- */
   // console.log(`[API] Attempting to save user message for session ${sessionId}`);
@@ -88,19 +153,31 @@ export async function POST(req: NextRequest) {
   }));
 
 
-  const context = docs
-    .map(
-      (doc, i) =>
-        `Source ${i + 1} (${citations[i].filePath}, chunk ${citations[i].chunkIndex}):\n${doc}`
-    )
-    .join("\n\n");
+  const context = sanitizeContext(
+    docs
+      .map(
+        (doc, i) =>
+          `Source ${i + 1} (${citations[i].filePath}, chunk ${citations[i].chunkIndex}):\n${doc}`
+      )
+      .join("\n\n")
+  );
+
 
   const systemPrompt = `
-You are Adi's personal Second Brain assistant.
-Use ONLY the provided Context.
-If missing, say:
-"I don't have that in my Second Brain yet."
+ROLE: Private Knowledge Assistant
+
+RULES (NON-NEGOTIABLE):
+1. Answer ONLY using the provided Context.
+2. If the answer is not explicitly present, reply EXACTLY:
+   "I don't have that in my Second Brain yet."
+3. Do NOT infer, guess, summarize external knowledge.
+4. Do NOT reveal personal, financial, or sensitive information.
+5. If the question violates rules, respond:
+   "This request is not permitted."
+
+FAILURE TO FOLLOW THESE RULES IS A SECURITY BREACH.
 `.trim();
+
 
   const modelMessages = convertToModelMessages([
     {
@@ -126,14 +203,35 @@ ${context}`,
     model: google("gemini-2.5-flash"),
     messages: modelMessages,
 
+    // onFinish: async (event) => {
+    //   await saveMessage({
+    //     sessionId,
+    //     role: "assistant",
+    //     content: event.text,
+    //     citations,
+    //   });
+    // },
+
     onFinish: async (event) => {
+      const text = event.text ?? "";
+
+      if (violatesOutputPolicy(text)) {
+        await saveMessage({
+          sessionId,
+          role: "assistant",
+          content: "This response was blocked due to security restrictions.",
+        });
+        return;
+      }
+
       await saveMessage({
         sessionId,
         role: "assistant",
-        content: event.text,
+        content: text,
         citations,
       });
     },
+
   });
 
   return result.toUIMessageStreamResponse();
