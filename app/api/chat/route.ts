@@ -177,7 +177,9 @@ RULES (NON-NEGOTIABLE):
 6. If the Context contains a YouTube URL, include it in the answer.
 7. Do NOT invent video links.
 8. Do NOT summarize video content unless explicitly written in Context.
-
+9. If you find an image (using markdown image syntax) in the Context, include it in your answer.
+10. Use the provided "**AI Description**" to answer questions about the image.
+11. Do NOT describe the image unless asked, but ALWAYS show it if relevant.
 
 FAILURE TO FOLLOW THESE RULES IS A SECURITY BREACH.
 `.trim();

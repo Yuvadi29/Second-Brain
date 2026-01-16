@@ -16,6 +16,7 @@ import { useSearchParams } from "next/navigation";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import { markdownSchema } from "@/lib/markdownSanitizer";
+import Image from "next/image";
 
 function extractYouTubeId(url: string): string | null {
     try {
@@ -167,7 +168,6 @@ export default function ChatSessionPage({ params }: { params: Promise<{ id: stri
                                                                     [rehypeSanitize, markdownSchema]
                                                                 ]}
                                                                 key={idx}
-                                                                skipHtml
                                                                 components={{
 
                                                                     code({ inline, className, children, ...props }: any) {
@@ -208,7 +208,28 @@ export default function ChatSessionPage({ params }: { params: Promise<{ id: stri
                                                                                 </div>
                                                                             </div>
                                                                         );
-                                                                    }
+                                                                    },
+                                                                    img({ src, alt }) {
+                                                                        if (!src) return null;
+
+                                                                        return (
+                                                                            <div className="group relative my-8 overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 shadow-2xl transition-all duration-300 hover:border-white/20">
+                                                                                <Image
+                                                                                    src={(src as string).replace("/public", "")}
+                                                                                    alt={alt ?? "Knowledge Image"}
+                                                                                    className="h-auto w-full transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                                                                                    loading="lazy"
+                                                                                    width={1600}
+                                                                                    height={900}
+                                                                                    quality={100}
+                                                                                />
+                                                                            </div>
+                                                                        );
+                                                                    },
+                                                                    p({ children }) {
+                                                                        return <div className="my-3">{children}</div>;
+                                                                    },
+
                                                                 }}
                                                             >
                                                                 {block}
@@ -222,10 +243,11 @@ export default function ChatSessionPage({ params }: { params: Promise<{ id: stri
                                     <div className="mt-1 px-2 text-[10px] text-zinc-600">
                                         {m.role === "user" ? "You" : "Second Brain"}
                                     </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
+                                </div >
+                            </motion.div >
+                        ))
+                        }
+                    </AnimatePresence >
 
                     {isLoading && (
                         <div className="flex gap-4">
@@ -238,11 +260,11 @@ export default function ChatSessionPage({ params }: { params: Promise<{ id: stri
                         </div>
                     )}
                     <div ref={bottomRef} className="h-4" />
-                </div>
-            </main>
+                </div >
+            </main >
 
             {/* Input Area */}
-            <div className="p-6 bg-linear-to-t from-black via-black to-transparent">
+            < div className="p-6 bg-linear-to-t from-black via-black to-transparent" >
                 <form onSubmit={onSubmit} className="max-w-3xl mx-auto relative group">
                     <Input
                         value={input}
@@ -265,7 +287,7 @@ export default function ChatSessionPage({ params }: { params: Promise<{ id: stri
                 <p className="text-center mt-3 text-[10px] text-zinc-600 tracking-wider">
                     AI generated responses may be inaccurate. Check citations for verification.
                 </p>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

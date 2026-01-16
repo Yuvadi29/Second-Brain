@@ -1,5 +1,8 @@
 ### Traditional Approach for Payments in India UPI
 Traditional System for Payments in India work on the basis of banks. Users must have a bank account to make payments. They can have their accounts in any of the banks like ICICI, HDFC, SBI, HSBC, etc. 
+
+![Traditional Payment Approach](/public/uploads/traditional_approach.png)
+
 All these banks are regulated by RBI which is the Reserve Bank of India
 
 Each user has the following unique details in their bank, irrespective of the bank that they have their account in:
@@ -28,6 +31,9 @@ While making the payment, it would create an intent which would be like:
 	amount: 5000
 Now this payment request goes to HDFC Bank, which then sends it to NPCI asking for the payment from aditya to anil of Rs 5000. 
 NPCI then asks if the amount is available in the sender's bank, that is when we get a screen on putting the PIN for the payment.  Once the amount is debited, it then sends a notification to user that the amount has been debited. NPCI now sends a request to the receiver's bank asking to credit the amount. If the server is busy, it will fail to response. That is when we get a notification that the receiver's server is busy. If it is not busy, the amount will be credited to the user2 and they will receive a message of credit.
+
+![UPI Payment Process](/public/uploads/upi_payment_process.png)
+
 NPCI has just made this possible using the from and to VPA(Virtual Payment Address).
 <iframe title="System Design of UPI Payments" src="https://www.youtube.com/embed/fqySz1Me2pI?feature=oembed" height="113" width="200" allowfullscreen="" allow="fullscreen" style="aspect-ratio: 1.76991 / 1; width: 100%; height: 100%;"></iframe>
 https://razorpay.com/blog/what-is-upi-and-how-it-works/
