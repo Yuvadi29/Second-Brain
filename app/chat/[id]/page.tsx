@@ -3,13 +3,15 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useState, useRef, useEffect } from "react";
+import "regenerator-runtime/runtime";
+import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import TypingIndicator from "@/app/components/TypingIndicator";
 import { Button } from "@/app/components/ui/Button";
 import { Input } from "@/app/components/ui/Input";
-import { Send, User, Bot, Brain } from "lucide-react";
+import { Send, User, Bot, Brain, Mic2, Mic, Pause } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { use } from "react";
 import { useSearchParams } from "next/navigation";
@@ -18,27 +20,11 @@ import rehypeSanitize from "rehype-sanitize";
 import { markdownSchema } from "@/lib/markdownSanitizer";
 import Image from "next/image";
 
-function extractYouTubeId(url: string): string | null {
-    try {
-        const u = new URL(url);
-
-        if (u.hostname.includes("youtube.com")) {
-            return u.searchParams.get("v");
-        }
-
-        if (u.hostname === "youtu.be") {
-            return u.pathname.slice(1);
-        }
-
-        return null;
-    } catch {
-        return null;
-    }
-}
 
 
-export default function ChatSessionPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = use(params);
+import { Suspense } from "react";
+
+function ChatContent({ id }: { id: string }) {
     const [input, setInput] = useState("");
     const { messages, setMessages, sendMessage, status } = useChat({
         transport: new DefaultChatTransport({
@@ -50,6 +36,24 @@ export default function ChatSessionPage({ params }: { params: Promise<{ id: stri
     } as any);
 
     const [historyLoaded, setHistoryLoaded] = useState(false);
+    const {
+        transcript,
+        listening,
+        resetTranscript,
+        browserSupportsSpeechRecognition
+    } = useSpeechRecognition();
+
+    // Effect to append transcript when listening stops
+    const isAppending = useRef(false);
+    useEffect(() => {
+        if (!listening && transcript) {
+            if (isAppending.current) return;
+            isAppending.current = true;
+            setInput((prev) => (prev ? prev + " " + transcript : transcript));
+            resetTranscript();
+            setTimeout(() => { isAppending.current = false; }, 100);
+        }
+    }, [listening, transcript, resetTranscript]);
 
     useEffect(() => {
         async function fetchHistory() {
@@ -101,6 +105,24 @@ export default function ChatSessionPage({ params }: { params: Promise<{ id: stri
             })
         }
     }, [historyLoaded, firstQuery, sendMessage, messages.length, id]);
+
+
+    function toggleListening() {
+        if (listening) {
+            SpeechRecognition.stopListening();
+        } else {
+            SpeechRecognition.startListening({ continuous: true });
+        }
+    }
+
+    if (!browserSupportsSpeechRecognition) {
+        return null;
+    }
+
+
+    if (!("webkitSpeechRecognition" in window)) {
+        alert("Voice input not supported in this browser");
+    }
 
     return (
         <div className="flex flex-col h-screen bg-[#0a0a0a]">
@@ -273,6 +295,13 @@ export default function ChatSessionPage({ params }: { params: Promise<{ id: stri
                         disabled={isLoading}
                         className="pr-14 h-14 rounded-2xl bg-zinc-900/50 border-white/10 focus:border-blue-500/50 focus:ring-blue-500/20 shadow-2xl transition-all"
                     />
+
+                    <div className="absolute right-14 top-2">
+                        <Button onClick={toggleListening} type="button" size="icon" className={`h-10 w-10 rounded-xl cursor-pointer ${listening ? "bg-red-600 animate-pulse" : ""}`}>
+                            {listening ? <Pause className="w-4 h-4 text-white" /> : <Mic className="w-4 h-4 text-white" />}
+                        </Button>
+                    </div>
+
                     <div className="absolute right-2 top-2">
                         <Button
                             type="submit"
@@ -289,5 +318,14 @@ export default function ChatSessionPage({ params }: { params: Promise<{ id: stri
                 </p>
             </div >
         </div >
+    );
+}
+
+export default function ChatSessionPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
+    return (
+        <Suspense fallback={<div className="flex h-screen items-center justify-center bg-[#0a0a0a] text-zinc-500">Loading session...</div>}>
+            <ChatContent id={id} />
+        </Suspense>
     );
 }

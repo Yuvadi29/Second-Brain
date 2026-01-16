@@ -1,7 +1,9 @@
 "use client";
 
-import { Brain, Send } from "lucide-react";
-import { useState } from "react";
+import { Brain, Mic, Send, Pause } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import "regenerator-runtime/runtime";
+import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import { useRouter } from "next/navigation";
 import { Button } from "@/app/components/ui/Button";
 
@@ -9,6 +11,24 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition
+  } = useSpeechRecognition();
+
+  // Effect to append transcript when listening stops
+  const isAppending = useRef(false);
+  useEffect(() => {
+    if (!listening && transcript) {
+      if (isAppending.current) return;
+      isAppending.current = true;
+      setInput((prev) => (prev ? prev + " " + transcript : transcript));
+      resetTranscript();
+      setTimeout(() => { isAppending.current = false; }, 100);
+    }
+  }, [listening, transcript, resetTranscript]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -28,6 +48,23 @@ export default function ChatPage() {
     router.push(
       `/chat/${sessionId}?q=${encodeURIComponent(input)}`
     );
+  };
+
+  function toggleListening() {
+    if (listening) {
+      SpeechRecognition.stopListening();
+    } else {
+      SpeechRecognition.startListening({ continuous: true });
+    }
+  }
+
+  if (!browserSupportsSpeechRecognition) {
+    return <span>Browser doesn't support speech recognition.</span>;
+  }
+
+
+  if (!("webkitSpeechRecognition" in window)) {
+    alert("Voice input not supported in this browser");
   }
 
   return (
@@ -64,6 +101,11 @@ export default function ChatPage() {
             text-sm
           "
         />
+        <div className="absolute right-14 top-2">
+          <Button onClick={toggleListening} type="button" size="icon" className={`h-10 w-10 rounded-xl ${listening ? "bg-red-600 animate-pulse" : ""}`}>
+            {listening ? <Pause className="w-4 h-4 text-white" /> : <Mic className="w-4 h-4 text-white" />}
+          </Button>
+        </div>
 
         <Button
           type="submit"
