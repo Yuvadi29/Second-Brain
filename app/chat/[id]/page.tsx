@@ -13,6 +13,28 @@ import { Send, User, Bot, Brain } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { use } from "react";
 import { useSearchParams } from "next/navigation";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
+import { markdownSchema } from "@/lib/markdownSanitizer";
+
+function extractYouTubeId(url: string): string | null {
+    try {
+        const u = new URL(url);
+
+        if (u.hostname.includes("youtube.com")) {
+            return u.searchParams.get("v");
+        }
+
+        if (u.hostname === "youtu.be") {
+            return u.pathname.slice(1);
+        }
+
+        return null;
+    } catch {
+        return null;
+    }
+}
+
 
 export default function ChatSessionPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
@@ -136,30 +158,63 @@ export default function ChatSessionPage({ params }: { params: Promise<{ id: stri
                                         {m.parts.map((p, i) => (
                                             p.type === "text" ? (
                                                 <div key={i} className="prose prose-sm prose-invert max-w-none">
-                                                    <Markdown
-                                                        components={{
-                                                            code({ inline, className, children, ...props }: any) {
-                                                                const match = /language-(\w+)/.exec(className || '');
-                                                                return !inline && match ? (
-                                                                    <SyntaxHighlighter
-                                                                        style={vscDarkPlus}
-                                                                        language={match[1]}
-                                                                        PreTag="div"
-                                                                        className="rounded-xl my-4 text-xs"
-                                                                        {...props}
-                                                                    >
-                                                                        {String(children).replace(/\n$/, '')}
-                                                                    </SyntaxHighlighter>
-                                                                ) : (
-                                                                    <code className="bg-white/10 px-1.5 py-0.5 rounded text-sm" {...props}>
-                                                                        {children}
-                                                                    </code>
-                                                                );
-                                                            }
-                                                        }}
-                                                    >
-                                                        {p.text}
-                                                    </Markdown>
+                                                    {p.text.split("\n\n").map((block, idx) => {
+
+                                                        return (
+                                                            <Markdown
+                                                                rehypePlugins={[
+                                                                    rehypeRaw,
+                                                                    [rehypeSanitize, markdownSchema]
+                                                                ]}
+                                                                key={idx}
+                                                                skipHtml
+                                                                components={{
+
+                                                                    code({ inline, className, children, ...props }: any) {
+                                                                        const match = /language-(\w+)/.exec(className || "");
+                                                                        return !inline && match ? (
+                                                                            <SyntaxHighlighter
+                                                                                style={vscDarkPlus}
+                                                                                language={match[1]}
+                                                                                PreTag="div"
+                                                                                className="rounded-xl my-4 text-xs"
+                                                                                {...props}
+                                                                            >
+                                                                                {String(children).replace(/\n$/, "")}
+                                                                            </SyntaxHighlighter>
+                                                                        ) : (
+                                                                            <code
+                                                                                className="bg-white/10 px-1.5 py-0.5 rounded text-sm"
+                                                                                {...props}
+                                                                            >
+                                                                                {children}
+                                                                            </code>
+                                                                        );
+                                                                    },
+                                                                    iframe({ src }) {
+                                                                        if (!src) return null;
+
+                                                                        return (
+                                                                            <div className="my-4 w-full overflow-hidden rounded-xl border border-white/10 bg-black">
+                                                                                <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+                                                                                    <iframe
+                                                                                        src={src}
+                                                                                        title="Embedded video"
+                                                                                        className="absolute top-0 left-0 w-full h-full"
+                                                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                                                        allowFullScreen
+                                                                                        referrerPolicy="strict-origin-when-cross-origin"
+                                                                                    />
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {block}
+                                                            </Markdown>
+                                                        );
+                                                    })}
                                                 </div>
                                             ) : null
                                         ))}

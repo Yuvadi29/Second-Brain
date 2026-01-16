@@ -32,7 +32,7 @@ const BLOCKED_PATTERNS = [
   /ssn/i,
   /aadhar/i,
   /pan card/i,
-  /what is|who is|define|explain/i, // general knowledge
+  /who is/i,
   /ignore previous/i,
   /system prompt/i,
   /you are chatgpt/i,
@@ -174,6 +174,10 @@ RULES (NON-NEGOTIABLE):
 4. Do NOT reveal personal, financial, or sensitive information.
 5. If the question violates rules, respond:
    "This request is not permitted."
+6. If the Context contains a YouTube URL, include it in the answer.
+7. Do NOT invent video links.
+8. Do NOT summarize video content unless explicitly written in Context.
+
 
 FAILURE TO FOLLOW THESE RULES IS A SECURITY BREACH.
 `.trim();
