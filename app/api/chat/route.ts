@@ -63,12 +63,13 @@ function sanitizeContext(text: string): string {
 }
 
 const OUTPUT_BLOCK_PATTERNS = [
-  /bank/i,
+  // Loosened to prevent false positives while keeping security intent
   /account number/i,
   /ifsc/i,
   /password/i,
   /credit card/i,
-  /\b\d{12,16}\b/,
+  // Refined regex for credit card numbers to avoid matching random long numbers
+  /\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|6(?:011|5[0-9]{2})[0-9]{12}|(?:2131|1800|35\d{3})\d{11})\b/,
 ];
 
 function violatesOutputPolicy(text: string): boolean {
@@ -118,7 +119,6 @@ export async function POST(req: NextRequest) {
 
 
   /* ---------------- SAVE USER MESSAGE ---------------- */
-  // console.log(`[API] Attempting to save user message for session ${sessionId}`);
   await saveMessage({
     sessionId,
     role: "user",
@@ -209,15 +209,6 @@ ${context}`,
     model: google("gemini-2.5-flash"),
     messages: modelMessages,
 
-    // onFinish: async (event) => {
-    //   await saveMessage({
-    //     sessionId,
-    //     role: "assistant",
-    //     content: event.text,
-    //     citations,
-    //   });
-    // },
-
     onFinish: async (event) => {
       const text = event.text ?? "";
 
@@ -242,4 +233,3 @@ ${context}`,
 
   return result.toUIMessageStreamResponse();
 }
-

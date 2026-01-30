@@ -13,7 +13,7 @@ if (!apiKey || !tenant || !database || !geminiApiKey) {
   throw new Error("CHROMA_API_KEY, CHROMA_TENANT, CHROMA_DATABASE, and GOOGLE_GENERATIVE_AI_API_KEY must be set");
 }
 
-const genAI = new GoogleGenerativeAI(geminiApiKey);
+export const genAI = new GoogleGenerativeAI(geminiApiKey);
 
 class GeminiEmbeddingFunction implements EmbeddingFunction {
   async generate(texts: string[]): Promise<number[][]> {

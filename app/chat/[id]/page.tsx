@@ -24,8 +24,21 @@ import Image from "next/image";
 
 import { Suspense } from "react";
 
+function transformYoutubeLinks(text: string): string {
+    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/g;
+
+    return text.replace(youtubeRegex, (match, videoId) => {
+        return `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`;
+    });
+}
+
 function ChatContent({ id }: { id: string }) {
     const [input, setInput] = useState("");
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
     const { messages, setMessages, sendMessage, status } = useChat({
         transport: new DefaultChatTransport({
             api: `/api/chat?sessionId=${id}`
@@ -115,13 +128,30 @@ function ChatContent({ id }: { id: string }) {
         }
     }
 
-    if (!browserSupportsSpeechRecognition) {
-        return null;
+    if (!isMounted) {
+        return (
+            <div className="flex flex-col h-screen bg-[#0a0a0a] animate-pulse">
+                <header className="h-16 border-b border-white/5 flex items-center px-8 bg-black/50 backdrop-blur-xl">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-zinc-800" />
+                        <div className="h-4 w-32 bg-zinc-800 rounded" />
+                    </div>
+                </header>
+                <main className="flex-1" />
+            </div>
+        );
     }
 
+    if (!browserSupportsSpeechRecognition) {
+        return (
+            <div className="flex h-screen items-center justify-center bg-[#0a0a0a] text-zinc-500">
+                Voice input not supported in this browser.
+            </div>
+        );
+    }
 
-    if (!("webkitSpeechRecognition" in window)) {
-        alert("Voice input not supported in this browser");
+    if (typeof window !== "undefined" && !("webkitSpeechRecognition" in window)) {
+        console.warn("Voice input not supported in this browser");
     }
 
     return (
@@ -254,7 +284,7 @@ function ChatContent({ id }: { id: string }) {
 
                                                                 }}
                                                             >
-                                                                {block}
+                                                                {transformYoutubeLinks(block)}
                                                             </Markdown>
                                                         );
                                                     })}
