@@ -75,3 +75,21 @@ export async function getMessagesBySession(sessionId: string) {
         .sort({ createdAt: 1 })
         .toArray();
 }
+
+/**
+ * Delete a chat session and all its messages
+ */
+export async function deleteChatSession(sessionId: string) {
+    const client = await clientPromise;
+    const db = client.db("secondbrain");
+
+    // Delete all messages for this session
+    await db.collection("messages").deleteMany({
+        sessionId: new ObjectId(sessionId),
+    });
+
+    // Delete the session itself
+    await db.collection("sessions").deleteOne({
+        _id: new ObjectId(sessionId),
+    });
+}

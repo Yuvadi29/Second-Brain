@@ -11,7 +11,8 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import TypingIndicator from "@/app/components/TypingIndicator";
 import { Button } from "@/app/components/ui/Button";
 import { Input } from "@/app/components/ui/Input";
-import { Send, User, Bot, Brain, Mic2, Mic, Pause } from "lucide-react";
+import { Send, User, Bot, Brain, Mic2, Mic, Pause, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { use } from "react";
 import { useSearchParams } from "next/navigation";
@@ -33,6 +34,7 @@ function transformYoutubeLinks(text: string): string {
 }
 
 function ChatContent({ id }: { id: string }) {
+    const router = useRouter();
     const [input, setInput] = useState("");
     const [isMounted, setIsMounted] = useState(false);
 
@@ -119,6 +121,28 @@ function ChatContent({ id }: { id: string }) {
         }
     }, [historyLoaded, firstQuery, sendMessage, messages.length, id]);
 
+    const handleDeleteChat = async () => {
+        if (!confirm("Are you sure you want to delete this chat session? This action cannot be undone.")) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/messages/${id}`, {
+                method: "DELETE",
+            });
+
+            if (res.ok) {
+                window.dispatchEvent(new CustomEvent("chat-updated"));
+                router.push("/");
+            } else {
+                alert("Failed to delete chat.");
+            }
+        } catch (error) {
+            console.error("Error deleting chat:", error);
+            alert("An error occurred while deleting the chat.");
+        }
+    };
+
 
     function toggleListening() {
         if (listening) {
@@ -167,6 +191,16 @@ function ChatContent({ id }: { id: string }) {
                         <p className="text-[10px] text-zinc-500 uppercase tracking-widest">ID: {id.slice(-6)}</p>
                     </div>
                 </div>
+
+                <Button
+                    onClick={handleDeleteChat}
+                    variant="ghost"
+                    size="icon"
+                    className="text-zinc-500 hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                    title="Delete Chat"
+                >
+                    <Trash2 className="w-4 h-4" />
+                </Button>
             </header>
 
             {/* Messages */}

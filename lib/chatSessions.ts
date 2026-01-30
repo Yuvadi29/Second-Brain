@@ -18,21 +18,21 @@ export async function getChatSessions() {
         .toArray();
 }
 
-export async function createChatSession() {
+export async function createChatSession(title: string = "New Chat") {
     const client = await clientPromise;
     const db = client.db("secondbrain");
 
     const now = new Date();
 
     const res = await db.collection("sessions").insertOne({
-        title: "New Chat",
+        title,
         createdAt: now,
         updatedAt: now,
     });
 
     return {
         _id: res.insertedId,
-        title: "New Chat",
+        title,
     };
 }
 

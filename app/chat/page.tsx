@@ -9,8 +9,13 @@ import { Button } from "@/app/components/ui/Button";
 
 export default function ChatPage() {
   const [input, setInput] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   const {
     transcript,
     listening,
@@ -44,6 +49,9 @@ export default function ChatPage() {
 
     const { sessionId } = await res.json();
 
+    // Notify sidebar to refresh
+    window.dispatchEvent(new CustomEvent("chat-updated"));
+
     // Redirect with first message
     router.push(
       `/chat/${sessionId}?q=${encodeURIComponent(input)}`
@@ -58,13 +66,24 @@ export default function ChatPage() {
     }
   }
 
-  if (!browserSupportsSpeechRecognition) {
-    return <span>Browser doesn't support speech recognition.</span>;
+  if (!isMounted) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center p-8 bg-[#0a0a0a] animate-pulse">
+        <div className="w-20 h-20 rounded-3xl bg-zinc-900 border border-white/5" />
+      </div>
+    );
   }
 
+  if (!browserSupportsSpeechRecognition) {
+    return (
+      <div className="flex h-full items-center justify-center p-8 bg-[#0a0a0a] text-zinc-500">
+        Browser doesn't support speech recognition.
+      </div>
+    );
+  }
 
-  if (!("webkitSpeechRecognition" in window)) {
-    alert("Voice input not supported in this browser");
+  if (typeof window !== "undefined" && !("webkitSpeechRecognition" in window)) {
+    console.warn("Voice input not supported in this browser");
   }
 
   return (
