@@ -35,7 +35,7 @@ NPCI then asks if the amount is available in the sender's bank, that is when we 
 ![UPI Payment Process](/public/uploads/upi_payment_process.png)
 
 NPCI has just made this possible using the from and to VPA(Virtual Payment Address).
-<iframe title="System Design of UPI Payments" src="https://www.youtube.com/embed/fqySz1Me2pI?feature=oembed" height="113" width="200" allowfullscreen="" allow="fullscreen" style="aspect-ratio: 1.76991 / 1; width: 100%; height: 100%;"></iframe>
+<iframe title="System Design of UPI Payments" src="https://www.youtube.com/embed/fqySz1Me2pI?si=rj-ODs9rpW6ZPBGt" height="113" width="200" allowfullscreen="" allow="fullscreen" style="aspect-ratio: 1.76991 / 1; width: 100%; height: 100%;"></iframe>
 https://razorpay.com/blog/what-is-upi-and-how-it-works/
 https://razorpay.com/blog/what-is-a-payment-service-provider/
 https://bytebytego.com/guides/unified-payments-interface-upi-in-india

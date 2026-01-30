@@ -4,68 +4,7 @@ import fs from "fs/promises";
 import path from "path";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { getOrCreateCollection, genAI } from "./chromaClient";
-
-async function augmentTextWithImageDescriptions(text: string): Promise<string> {
-    const imageRegex = /!\[([^\]]*)\]\((.*?)\)/g;
-    let match;
-    let newText = text;
-    const replacements: { start: number, end: number, replacement: string }[] = [];
-
-    // Find all matches first
-    while ((match = imageRegex.exec(text)) !== null) {
-        const [fullMatch, altText, imagePath] = match;
-        const index = match.index;
-
-        // Check if it's a local path we care about
-        // We assume paths are like "uploads/..." or "/uploads/..." or "./uploads/..."
-        const normalizedPath = imagePath.startsWith("/") ? imagePath.slice(1) : imagePath;
-
-        // Only process if it points to uploads directory (simple check)
-        if (!normalizedPath.includes("uploads/")) {
-            continue;
-        }
-
-        const localPath = path.join(process.cwd(), "public", normalizedPath);
-
-        try {
-            // Check if file exists
-            await fs.access(localPath);
-            const imageBuffer = await fs.readFile(localPath);
-            const base64Image = imageBuffer.toString("base64");
-
-            // Generate description
-            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-            const prompt = "Describe this image in detail for a knowledge base. Capture text, diagrams, and key visual elements.";
-
-            const result = await model.generateContent([
-                prompt,
-                {
-                    inlineData: {
-                        data: base64Image,
-                        mimeType: "image/png", // Assuming PNG for now, but could detect
-                    },
-                },
-            ]);
-
-            const description = result.response.text();
-
-            const replacement = `${fullMatch}\n> **AI Description:** ${description.trim()}\n`;
-
-            // We can't simple replace string because indices shift. 
-            // Better to rebuild string or use replacements array.
-            // Using simple replace might fail if duplicates exist. 
-            // We'll process sequentially for simplicity as we have async operations.
-            newText = newText.replace(fullMatch, replacement);
-
-        } catch (error) {
-            console.error(`Failed to process image ${imagePath}:`, error);
-            // Keep original text if failure
-        }
-    }
-
-    return newText;
-}
-
+import { addToLexicalIndex } from "./lexicalIndex";
 
 // Re-implementing with sequential replacement to handle async properly and avoid index issues
 async function processImagesInMarkdown(text: string): Promise<string> {
@@ -159,6 +98,14 @@ export async function ingestTextIntoChroma(
             chunkIndex: i
         })),
     });
+
+    addToLexicalIndex(
+        chunks.map((chunk, i) => ({
+            id: `${filePath}-${i}`,
+            content: chunk,
+            filePath,
+        }))
+    );
 
     // console.log(`Ingested ${chunks?.length} chunks from ${filePath}`);
 }

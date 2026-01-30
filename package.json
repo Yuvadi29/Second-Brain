@@ -28,6 +28,7 @@
     "langchain": "^1.1.1",
     "lucide-react": "^0.562.0",
     "mammoth": "^1.11.0",
+    "minisearch": "^7.2.0",
     "mongodb": "^7.0.0",
     "motion": "^12.23.26",
     "next": "16.0.10",

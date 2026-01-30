@@ -4,6 +4,7 @@ import { streamText, convertToModelMessages } from "ai";
 
 import { getOrCreateCollection } from "@/lib/chromaClient";
 import { Citation, saveMessage } from "@/lib/chatMessages";
+import { hybridSearch } from "@/lib/hybridSearch";
 
 export const runtime = "nodejs";
 export const maxDuration = 40;
@@ -128,39 +129,48 @@ export async function POST(req: NextRequest) {
   /* ---------------- RAG ---------------- */
   const collection = await getOrCreateCollection(COLLECTION_NAME);
 
-  const ragResults = await collection.query({
-    queryTexts: [query],
-    nResults: 5,
-    include: ["documents", "metadatas"],
-  });
+  // const ragResults = await collection.query({
+  //   queryTexts: [query],
+  //   nResults: 5,
+  //   include: ["documents", "metadatas"],
+  // });
 
-  const rawDocs = ragResults.documents?.[0] ?? [];
-  const docs: string[] = rawDocs.filter(
-    (doc): doc is string => typeof doc === "string"
-  );
+  const ragResults = await hybridSearch(query);
 
-  const rawMetas = ragResults.metadatas?.[0] ?? [];
-  const metas: ChromaMetadata[] = rawMetas.filter(
-    (m): m is ChromaMetadata => m !== null
-  );
+  // const rawDocs = ragResults.documents?.[0] ?? [];
+  // const docs: string[] = rawDocs.filter(
+  //   (doc): doc is string => typeof doc === "string"
+  // );
 
-  const citations: Citation[] = metas.map((m) => ({
-    filePath: m.filePath ?? "unknown",
-    chunkIndex:
-      typeof m.chunkIndex === "number"
-        ? m.chunkIndex
-        : Number(m.chunkIndex ?? 0),
-  }));
+  // const rawMetas = ragResults.metadatas?.[0] ?? [];
+  // const metas: ChromaMetadata[] = rawMetas.filter(
+  //   (m): m is ChromaMetadata => m !== null
+  // );
+
+  // const citations: Citation[] = metas.map((m) => ({
+  //   filePath: m.filePath ?? "unknown",
+  //   chunkIndex:
+  //     typeof m.chunkIndex === "number"
+  //       ? m.chunkIndex
+  //       : Number(m.chunkIndex ?? 0),
+  // }));
 
 
-  const context = sanitizeContext(
-    docs
-      .map(
-        (doc, i) =>
-          `Source ${i + 1} (${citations[i].filePath}, chunk ${citations[i].chunkIndex}):\n${doc}`
-      )
-      .join("\n\n")
-  );
+  // const context = sanitizeContext(
+  //   docs
+  //     .map(
+  //       (doc, i) =>
+  //         `Source ${i + 1} (${citations[i].filePath}, chunk ${citations[i].chunkIndex}):\n${doc}`
+  //     )
+  //     .join("\n\n")
+  // );
+
+const context = ragResults
+  .map(
+    (r, i) =>
+      `Source ${i + 1} (${r.meta?.filePath ?? "unknown"}):\n${r.content}`
+  )
+  .join("\n\n");
 
 
   const systemPrompt = `
@@ -225,7 +235,7 @@ ${context}`,
         sessionId,
         role: "assistant",
         content: text,
-        citations,
+        // citations,
       });
     },
 
