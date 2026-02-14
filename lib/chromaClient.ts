@@ -17,7 +17,8 @@ export const genAI = new GoogleGenerativeAI(geminiApiKey);
 
 class GeminiEmbeddingFunction implements EmbeddingFunction {
   async generate(texts: string[]): Promise<number[][]> {
-    const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+    // usage: "gemini-embedding-001" outputs 3072 dimensions
+    const model = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
     const results = await Promise.all(
       texts.map((text) => model.embedContent(text))
     );
