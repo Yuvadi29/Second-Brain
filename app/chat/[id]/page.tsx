@@ -6,31 +6,32 @@ import { useState, useRef, useEffect } from "react";
 import "regenerator-runtime/runtime";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import TypingIndicator from "@/app/components/TypingIndicator";
 import { Button } from "@/app/components/ui/Button";
 import { Input } from "@/app/components/ui/Input";
-import { Send, User, Bot, Brain, Mic2, Mic, Pause, Trash2 } from "lucide-react";
+import { Send, User, Bot, Brain, Mic2, Mic, Pause, Trash2, Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { use } from "react";
 import { useSearchParams } from "next/navigation";
-import rehypeRaw from "rehype-raw";
-import rehypeSanitize from "rehype-sanitize";
-import { markdownSchema } from "@/lib/markdownSanitizer";
+
 import Image from "next/image";
 
 
 
 import { Suspense } from "react";
 
-function transformYoutubeLinks(text: string): string {
-    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/g;
+function extractYoutubeId(url: string): string | null {
+    const match = url.match(/(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    return match ? match[1] : null;
+}
 
-    return text.replace(youtubeRegex, (match, videoId) => {
-        return `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`;
-    });
+/** Convert legacy <iframe> tags (from old messages) back to plain URLs so the `a` component can handle them */
+function normalizeIframeTags(text: string): string {
+    return text.replace(/<iframe\s[^>]*?\bsrc=["']([^"']+)["'][^>]*>\s*<\/iframe>/gi, (_, src) => src);
 }
 
 function ChatContent({ id }: { id: string }) {
@@ -74,6 +75,11 @@ function ChatContent({ id }: { id: string }) {
         async function fetchHistory() {
             try {
                 const res = await fetch(`/api/messages/${id}`);
+                if (!res.ok) {
+                    console.error(`Failed to fetch history: ${res.status}`);
+                    setHistoryLoaded(true);
+                    return;
+                }
                 const data = await res.json();
                 if (Array.isArray(data) && data.length > 0) {
                     const mappedMessages = data.map((m: any) => ({
@@ -181,14 +187,25 @@ function ChatContent({ id }: { id: string }) {
     return (
         <div className="flex flex-col h-screen bg-[#0a0a0a]">
             {/* Header */}
-            <header className="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-black/50 backdrop-blur-xl shrink-0">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center border border-white/10">
-                        <Brain className="w-4 h-4 text-blue-400" />
-                    </div>
-                    <div>
-                        <h1 className="text-sm font-semibold text-white">Knowledge Session</h1>
-                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest">ID: {id.slice(-6)}</p>
+            <header className="h-16 border-b border-white/5 flex items-center justify-between px-4 bg-black/50 backdrop-blur-xl shrink-0">
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => window.dispatchEvent(new CustomEvent("toggle-sidebar"))}
+                        className="text-zinc-500 hover:text-white"
+                        title="Toggle Sidebar"
+                    >
+                        <Menu className="w-5 h-5" />
+                    </Button>
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center border border-white/10">
+                            <Brain className="w-4 h-4 text-blue-400" />
+                        </div>
+                        <div>
+                            <h1 className="text-sm font-semibold text-white">Knowledge Session</h1>
+                            <p className="text-[10px] text-zinc-500 uppercase tracking-widest">ID: {id.slice(-6)}</p>
+                        </div>
                     </div>
                 </div>
 
@@ -204,8 +221,8 @@ function ChatContent({ id }: { id: string }) {
             </header>
 
             {/* Messages */}
-            <main className="flex-1 overflow-y-auto px-4 md:px-0 py-8">
-                <div className="max-w-3xl mx-auto space-y-8 pb-12">
+            <main className="flex-1 overflow-y-auto py-8">
+                <div className="max-w-4xl mx-auto px-6 space-y-8 pb-12">
                     {messages.length === 0 && (
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -237,8 +254,8 @@ function ChatContent({ id }: { id: string }) {
                                     {m.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
                                 </div>
 
-                                <div className={`flex flex-col max-w-[85%] ${m.role === "user" ? "items-end" : "items-start"}`}>
-                                    <div className={`px-5 py-3 rounded-2xl ${m.role === "user"
+                                <div className={`flex flex-col min-w-0 max-w-[85%] ${m.role === "user" ? "items-end" : "items-start"}`}>
+                                    <div className={`px-5 py-3 rounded-2xl min-w-0 w-full ${m.role === "user"
                                         ? "bg-blue-600 text-white"
                                         : "bg-zinc-900 border border-white/5 text-zinc-200"
                                         }`}>
@@ -249,10 +266,7 @@ function ChatContent({ id }: { id: string }) {
 
                                                         return (
                                                             <Markdown
-                                                                rehypePlugins={[
-                                                                    rehypeRaw,
-                                                                    [rehypeSanitize, markdownSchema]
-                                                                ]}
+                                                                remarkPlugins={[remarkGfm]}
                                                                 key={idx}
                                                                 components={{
 
@@ -277,22 +291,36 @@ function ChatContent({ id }: { id: string }) {
                                                                             </code>
                                                                         );
                                                                     },
-                                                                    iframe({ src }) {
-                                                                        if (!src) return null;
+                                                                    a({ href, children }) {
+                                                                        if (!href) return <>{children}</>;
+
+                                                                        const videoId = extractYoutubeId(href);
+                                                                        if (videoId) {
+                                                                            return (
+                                                                                <div className="my-4 overflow-hidden rounded-xl border border-white/10 bg-black">
+                                                                                    <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+                                                                                        <iframe
+                                                                                            src={`https://www.youtube.com/embed/${videoId}`}
+                                                                                            title="Embedded video"
+                                                                                            className="absolute top-0 left-0 w-full h-full"
+                                                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                                                            allowFullScreen
+                                                                                            referrerPolicy="strict-origin-when-cross-origin"
+                                                                                        />
+                                                                                    </div>
+                                                                                </div>
+                                                                            );
+                                                                        }
 
                                                                         return (
-                                                                            <div className="my-4 w-full overflow-hidden rounded-xl border border-white/10 bg-black">
-                                                                                <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
-                                                                                    <iframe
-                                                                                        src={src}
-                                                                                        title="Embedded video"
-                                                                                        className="absolute top-0 left-0 w-full h-full"
-                                                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                                                        allowFullScreen
-                                                                                        referrerPolicy="strict-origin-when-cross-origin"
-                                                                                    />
-                                                                                </div>
-                                                                            </div>
+                                                                            <a
+                                                                                href={href}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="text-blue-400 hover:text-blue-300 underline underline-offset-2"
+                                                                            >
+                                                                                {children}
+                                                                            </a>
                                                                         );
                                                                     },
                                                                     img({ src, alt }) {
@@ -318,7 +346,7 @@ function ChatContent({ id }: { id: string }) {
 
                                                                 }}
                                                             >
-                                                                {transformYoutubeLinks(block)}
+                                                                {normalizeIframeTags(block)}
                                                             </Markdown>
                                                         );
                                                     })}
@@ -350,8 +378,8 @@ function ChatContent({ id }: { id: string }) {
             </main >
 
             {/* Input Area */}
-            < div className="p-6 bg-linear-to-t from-black via-black to-transparent" >
-                <form onSubmit={onSubmit} className="max-w-3xl mx-auto relative group">
+            <div className="p-6 bg-linear-to-t from-black via-black to-transparent">
+                <form onSubmit={onSubmit} className="max-w-4xl mx-auto relative group">
                     <Input
                         value={input}
                         onChange={(e) => setInput(e.target.value)}

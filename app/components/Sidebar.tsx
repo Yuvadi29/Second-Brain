@@ -29,10 +29,17 @@ export default function ChatSidebar() {
     useEffect(() => {
         fetchSessions();
 
-        // Listen for internal updates (e.g. from the chat page)
+        // Listen for internal updates
         const handleUpdate = () => fetchSessions();
+        const handleToggle = () => setIsCollapsed(prev => !prev);
+
         window.addEventListener("chat-updated", handleUpdate);
-        return () => window.removeEventListener("chat-updated", handleUpdate);
+        window.addEventListener("toggle-sidebar", handleToggle);
+
+        return () => {
+            window.removeEventListener("chat-updated", handleUpdate);
+            window.removeEventListener("toggle-sidebar", handleToggle);
+        };
     }, []);
 
     const handleDeleteSession = async (e: React.MouseEvent, id: string) => {
@@ -59,17 +66,12 @@ export default function ChatSidebar() {
     return (
         <motion.aside
             initial={false}
-            animate={{ width: isCollapsed ? 64 : 288 }}
-            className="h-screen border-r border-white/5 bg-black flex flex-col relative shrink-0 overflow-hidden"
+            animate={{ width: isCollapsed ? 0 : 288 }}
+            className={cn(
+                "h-screen border-r border-white/5 bg-black flex flex-col relative shrink-0 overflow-hidden",
+                isCollapsed ? "border-none" : "border-r"
+            )}
         >
-            {/* Collapse Toggle */}
-            <button
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-500 hover:text-white z-50 transition-colors"
-                title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-            >
-                {isCollapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
-            </button>
 
             {/* Header */}
             <div className={cn("p-6", isCollapsed && "px-4")}>
